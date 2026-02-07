@@ -33,7 +33,7 @@ public class ConfiguracionSwagger {
 	      )
 	      .servers(List.of(
 	        new Server()
-	          .url("http://localhost:443")
+	          .url("http://localhost:8081")
 	          .description("Servidor local")
 	        )
 	      )

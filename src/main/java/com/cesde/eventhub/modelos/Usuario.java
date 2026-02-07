@@ -3,10 +3,17 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+
+import com.cesde.eventhub.enumeraciones.RolesUsuario;
 
 @Entity
 @Table(name = "usuarios")
@@ -19,16 +26,16 @@ public class Usuario {
 	@Column(name = "nombre", nullable = false, length = 50)
 	private String nombre;
 	
+	@Email
 	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 	
 	@Column(name = "contraseña", nullable = false, length = 45)
 	private String contraseña;
 	
-	//El tipo de dato se cambiará a ENUM para solo tener una lista de roles
-	//NO OLVIDAR
 	@Column(name = "rol", nullable = false)
-	private String rol;
+	@Enumerated(EnumType.STRING)
+	private RolesUsuario rol;
 	
 	@Column(name = "activo", nullable = false)
 	private Boolean activo;
@@ -39,13 +46,12 @@ public class Usuario {
 	@Column(name = "updatedAt", nullable = false)
 	private LocalDateTime updatedAt;
 
-	//Súper constructores
+	//Mega super increibles constructores
 	public Usuario() {
 		
 	}
 	
-	
-	public Usuario(Long id, String nombre, String email, String contraseña, String rol, Boolean activo,
+	public Usuario(Long id, String nombre, String email, String contraseña, RolesUsuario rol, Boolean activo,
 			LocalDateTime createdAt, LocalDateTime updatedAt) {
 		this.id = id;
 		this.nombre = nombre;
@@ -57,7 +63,16 @@ public class Usuario {
 		this.updatedAt =  LocalDateTime.now();
 	}
 
-
+	@PrePersist
+	  protected void onCreate() {
+	    this.createdAt = LocalDateTime.now();
+	    this.updatedAt = LocalDateTime.now();
+	  }
+	
+	@PreUpdate
+	  protected void onUpdate() {
+	    this.updatedAt = LocalDateTime.now();
+	  }
 
 	//Getters y setters
 	public Long getId() {
@@ -76,9 +91,15 @@ public class Usuario {
 		return contraseña;
 	}
 
-	public String getRol() {
+	public RolesUsuario getRol() {
 		return rol;
 	}
+
+
+	public void setRol(RolesUsuario rol) {
+		this.rol = rol;
+	}
+
 
 	public Boolean getActivo() {
 		return activo;
