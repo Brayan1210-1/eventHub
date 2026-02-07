@@ -9,25 +9,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.UsuarioDTO;
 import com.cesde.eventhub.servicio.UsuarioServicio;
-
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid; 
 
 
 @RestController
-@RequestMapping("/api/v1/login")
+@RequestMapping("/api/v1")
 public class UsuarioControlador {
 
 	@Autowired
 	private UsuarioServicio usuarioServicio;
 	
-	@PostMapping
-	public ResponseEntity<?> crearUsuario(UsuarioDTO usuario) {
+	@PostMapping("/registro")
+	public ResponseEntity<UsuarioDTO> crearUsuario(@RequestBody @Valid UsuarioDTO usuario) {
 
-        try {
+        
             UsuarioDTO usuarioCreado = usuarioServicio.crearCliente(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCreado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Datos inválidos o email ya existe");
-        }
+       
     }
+	
 	
 }
