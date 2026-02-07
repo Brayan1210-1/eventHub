@@ -4,5 +4,5 @@ public enum RolesUsuario {
  ADMIN,
  ORGANIZADOR,
  VENDEDOR,
- ClIENTE
+ CLIENTE
 }

@@ -1,7 +1,6 @@
 package com.cesde.eventhub.servicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.cesde.eventhub.dto.UsuarioDTO;
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
 import com.cesde.eventhub.modelos.Usuario;
@@ -24,11 +23,14 @@ public class UsuarioServicio {
 		usuarioAGuardar.setNombre(usuarioDTO.getNombre());
 		usuarioAGuardar.setEmail(usuarioDTO.getEmail());
 		usuarioAGuardar.setContraseña(usuarioDTO.getContraseña());
-        usuarioAGuardar.setRol(RolesUsuario.ClIENTE);		
+        usuarioAGuardar.setRol(RolesUsuario.CLIENTE);		
         usuarioAGuardar.setActivo(true);
         
         Usuario usuarioGuardado = usuarioRepos.save(usuarioAGuardar);
         
 		return UsuarioDTO.desdeEntidad(usuarioGuardado);
 	}
+	
+	
+	
 }
