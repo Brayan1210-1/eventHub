@@ -4,32 +4,48 @@ import com.cesde.eventhub.modelos.Usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UsuarioDTO {
 
-
-	
 	@NotBlank
 	private String nombre;
+	
+	@NotBlank
+	private String apellido;
 	
 	@Email
 	@NotBlank
 	private String email;
 	
 	@NotBlank
-	private String contraseña;
+	private String contrasena;
+	
+	@NotBlank
+	private String documento;
+	
+	@NotBlank
+	private String telefono;
 	
 	
 	public UsuarioDTO() {
 		
 	}
 	
-	public UsuarioDTO(String nombre, String email, String contraseña) {
-		this.nombre = nombre;
-		this.email = email;
-		this.contraseña = contraseña;
-	}
 	
+	public UsuarioDTO( String nombre,  String apellido,   String email,
+			 String contrasena,  String documento,  String telefono) {
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.email = email;
+		this.contrasena = contrasena;
+		this.documento = documento;
+		this.telefono = telefono;
+	}
+
 	public UsuarioDTO(String nombre, String email) {
 		this.nombre = nombre;
 		this.email = email;
@@ -38,42 +54,20 @@ public class UsuarioDTO {
 	public Usuario haciaEntidad() {
 		Usuario usuario = new Usuario();
 		usuario.setNombre(this.nombre);
+		usuario.setApellido(this.apellido);
 		usuario.setEmail(this.email);
-		usuario.setContraseña(this.contraseña);
+		usuario.setContrasena(this.contrasena);
+		usuario.setDocumento(this.documento);
+		usuario.setTelefono(this.telefono);
+		
 		return usuario;
 	}
 	
-	public static UsuarioDTO desdeEntidad(Usuario usuario) {
+	public static UsuarioDTO desdeEntidadCliente(Usuario usuario) {
 		return new UsuarioDTO (
 		  usuario.getNombre(),
 		  usuario.getEmail()
 		  );
 	}
-	
 
-	public String getNombre() {
-		return nombre;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getContraseña() {
-		return contraseña;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setContraseña(String contraseña) {
-		this.contraseña = contraseña;
-	}
-
-	
 }
