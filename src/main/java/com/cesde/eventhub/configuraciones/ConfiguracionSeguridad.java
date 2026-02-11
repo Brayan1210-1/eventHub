@@ -14,13 +14,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class ConfiguracionSeguridad {
-	
-	
+
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(10);
 	}
-	
+
 	    @Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	        http
@@ -32,13 +32,13 @@ public class ConfiguracionSeguridad {
 	                        "/swagger-ui/**",
 	                        "/docs/**").permitAll()
 	                .anyRequest().authenticated())
-	                
+
 	            .httpBasic(Customizer.withDefaults());
-	           
+
 	        return http.build();
 	    }
-	    
-	   
-	
+
+
+
 
 }

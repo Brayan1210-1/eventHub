@@ -11,11 +11,11 @@ import com.cesde.eventhub.modelos.Usuario;
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Long>{
 
 	public Optional<Usuario> findByNombre(String nombre);
-	
+
 	public Optional<Usuario> findByEmail(String email);
 
 	public boolean existsByEmail(String email);
-	
+
 	public boolean existsByDocumento(String documento);
-	
+
 }

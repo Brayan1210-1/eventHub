@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.UsuarioDTO;
+import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
+import com.cesde.eventhub.mapper.UsuarioMapper;
 import com.cesde.eventhub.modelos.Usuario;
 import com.cesde.eventhub.repositorio.UsuarioRepositorio;
 
@@ -14,39 +16,37 @@ public class UsuarioServicio {
 
 	@Autowired
 	private  UsuarioRepositorio usuarioRepos;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private UsuarioMapper usuarioMapper;
+
 	@Transactional
-	public UsuarioDTO crearCliente(UsuarioDTO usuarioDTO) {
-		
+	public UsuarioRespuestaDTO crearCliente(UsuarioDTO usuarioDTO) {
+
 		if(usuarioRepos.existsByEmail(usuarioDTO.getEmail()) || usuarioRepos.existsByDocumento(usuarioDTO.getDocumento())) {
 		throw new RuntimeException("Ya existe un usuario con ese email o documento");
-		
+
 		}
+
+		Usuario usuarioAGuardar = usuarioMapper.haciaEntidad(usuarioDTO);
 		
-		Usuario usuarioAGuardar = new Usuario();
-		usuarioAGuardar.setNombre(usuarioDTO.getNombre());
-		usuarioAGuardar.setEmail(usuarioDTO.getEmail());
-		usuarioAGuardar.setApellido(usuarioDTO.getApellido());
-		usuarioAGuardar.setDocumento(usuarioDTO.getDocumento());
-		usuarioAGuardar.setTelefono(usuarioDTO.getTelefono());
-        usuarioAGuardar.setRol(RolesUsuario.CLIENTE);		
-        usuarioAGuardar.setActivo(true);
-        
+		usuarioAGuardar.setRol(RolesUsuario.CLIENTE);
+		usuarioAGuardar.setActivo(true);
+
+		//CIFRAR y asignar contraseña
         String contraseña = usuarioDTO.getContrasena();
-        
-        //CIFRAR CONTRASEÑA
         String contraseñaCifrada = passwordEncoder.encode(contraseña);
-        
         usuarioAGuardar.setContrasena(contraseñaCifrada);
-        
+
         Usuario usuarioGuardado = usuarioRepos.save(usuarioAGuardar);
-        
-		return UsuarioDTO.desdeEntidadCliente(usuarioGuardado);
+
+        //aún falta devolver el jwt
+		return usuarioMapper.haciaDto(usuarioGuardado);
 	}
-	
-	
-	
+
+
+
 }
