@@ -21,7 +21,7 @@ public class UsuarioControlador {
 	private UsuarioServicio usuarioServicio;
 	
 	@PostMapping("/registro")
-	public ResponseEntity<UsuarioDTO> crearUsuario(@RequestBody @Valid UsuarioDTO usuario) {
+	public ResponseEntity<UsuarioDTO> crearUsuario(@Valid @RequestBody UsuarioDTO usuario) {
 
         
             UsuarioDTO usuarioCreado = usuarioServicio.crearCliente(usuario);

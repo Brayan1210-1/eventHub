@@ -12,9 +12,13 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import lombok.Getter;
+import lombok.Setter;
 
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -26,12 +30,21 @@ public class Usuario {
 	@Column(name = "nombre", nullable = false, length = 50)
 	private String nombre;
 	
+	@Column(name = "apellido", nullable = false, length = 50)
+	private String apellido;
+	
+	@Column(name = "documento", nullable = false, length = 20, unique = true)
+	private String documento;
+	
 	@Email
-	@Column(name = "email", nullable = false, length = 50)
+	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
 	
-	@Column(name = "contraseña", nullable = false, length = 45)
-	private String contraseña;
+	@Column(name = "telefono", length = 30, unique = true, nullable = false)
+	private String telefono;
+	
+	@Column(name = "contrasena", nullable = false)
+	private String contrasena;
 	
 	@Column(name = "rol", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -51,12 +64,27 @@ public class Usuario {
 		
 	}
 	
+	public Usuario(Long id, String nombre, String apellido, String documento, String email, String telefono,
+			String contrasena, RolesUsuario rol, Boolean activo, LocalDateTime createdAt, LocalDateTime updatedAt) {
+		this.id = id;
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.documento = documento;
+		this.email = email;
+		this.telefono = telefono;
+		this.contrasena = contrasena;
+		this.rol = rol;
+		this.activo = activo;
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+
 	public Usuario(Long id, String nombre, String email, String contraseña, RolesUsuario rol, Boolean activo,
 			LocalDateTime createdAt, LocalDateTime updatedAt) {
 		this.id = id;
 		this.nombre = nombre;
 		this.email = email;
-		this.contraseña = contraseña;
+		this.contrasena = contraseña;
 		this.rol = rol;
 		this.activo = activo;
 		this.createdAt =  LocalDateTime.now();
@@ -73,66 +101,5 @@ public class Usuario {
 	  protected void onUpdate() {
 	    this.updatedAt = LocalDateTime.now();
 	  }
-
-	//Getters y setters
-	public Long getId() {
-		return id;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getContraseña() {
-		return contraseña;
-	}
-
-	public RolesUsuario getRol() {
-		return rol;
-	}
-
-
-	public void setRol(RolesUsuario rol) {
-		this.rol = rol;
-	}
-
-
-	public Boolean getActivo() {
-		return activo;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setContraseña(String contraseña) {
-		this.contraseña = contraseña;
-	}
-
-
-	public void setActivo(Boolean activo) {
-		this.activo = activo;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
 
 }
