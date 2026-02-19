@@ -9,7 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UsuarioRespuestaDTO {
 	
+	private Long id;
 	private String nombre;
+	private String rol;
     private String apellido;
     private String email;
     private String documento;
