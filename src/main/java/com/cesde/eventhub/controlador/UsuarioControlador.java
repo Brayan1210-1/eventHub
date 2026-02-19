@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.UsuarioDTO;
 import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
+import com.cesde.eventhub.servicio.JwtServicio;
 import com.cesde.eventhub.servicio.UsuarioServicio;
 
 import jakarta.validation.Valid;
@@ -21,13 +22,23 @@ public class UsuarioControlador {
 
 	@Autowired
 	private UsuarioServicio usuarioServicio;
+	
+	@Autowired
+	private JwtServicio jwtServicio;
 
 	@PostMapping("/registro")
-	public ResponseEntity<UsuarioRespuestaDTO> crearUsuario(@Valid @RequestBody UsuarioDTO usuario) {
+	public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioDTO usuario) {
 
 
             UsuarioRespuestaDTO usuarioCreado = usuarioServicio.crearCliente(usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCreado);
+            
+            String token = jwtServicio.generateToken(
+                    usuarioCreado.getId(), 
+                    usuarioCreado.getEmail(), 
+                    usuarioCreado.getRol(),
+                    usuarioCreado.getNombre()
+                );
+            return ResponseEntity.status(HttpStatus.CREATED).body(token);
 
     }
 
