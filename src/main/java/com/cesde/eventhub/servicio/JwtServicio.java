@@ -21,10 +21,13 @@ public class JwtServicio {
 	 @Value("${jwt.secret}")
 	 private String secretKey; 
 
-	 @Value("${jwt.expiration}")
-	 private long jwtExpiration; 
+	 @Value("${jwt.access-expiration}")
+	 private long jwtAccess; 
 	 
-	 public String generateToken(Long id, String email, String rol, String nombre) {
+	 @Value("${jwt.refresh-expiration}")
+	 private long jwtRefresh;
+	 
+	 public String generarAccessToken(Long id, String email, String rol, String nombre) {
 	        Map<String, Object> claims = new HashMap<>();
 	        claims.put("id", id);
 	        claims.put("email", email);
@@ -35,21 +38,33 @@ public class JwtServicio {
 	        		.claims(claims) 
 	                .subject(email) 
 	                .issuedAt(new Date(System.currentTimeMillis()))  
-	                .expiration(new Date(System.currentTimeMillis() + jwtExpiration)) 
+	                .expiration(new Date(System.currentTimeMillis() + jwtAccess)) 
 	                .signWith(getSignInKey()) 
 	                .compact();
 	    }
 	 
-	 public String extractUsername(String token) {
+	 public String generarRefreshToken(String email) {
+		 
+		 return Jwts.builder()
+	                .subject(email) 
+	                .issuedAt(new Date(System.currentTimeMillis()))  
+	                .expiration(new Date(System.currentTimeMillis() + jwtRefresh)) 
+	                .signWith(getSignInKey()) 
+	                .compact();
+		 
+	 }
+	 
+		 
+	 public String extraerEmail(String token) {
 	        return extractAllClaims(token).getSubject();
 	    }
 	 
-	 public boolean isTokenValid(String token, UserDetails userDetails) {
-	        final String username = extractUsername(token);
-	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	 public boolean tokenEsValido(String token, UserDetails userDetails) {
+	        final String username = extraerEmail(token);
+	        return (username.equals(userDetails.getUsername()) && !tokenEstaExpirado(token));
 	    }
 	 
-	 private boolean isTokenExpired(String token) {
+	 private boolean tokenEstaExpirado(String token) {
 	        return extractAllClaims(token).getExpiration().before(new Date());
 	    }
 	 
