@@ -43,8 +43,10 @@ public class ConfiguracionSeguridad {
 	            		 )
 	             
 	            .authorizeHttpRequests(auth -> auth
-	                .requestMatchers(HttpMethod.POST, "/api/v1/registro").permitAll()
-	                .requestMatchers(HttpMethod.POST, "/api/v1/login").permitAll()
+	                .requestMatchers(HttpMethod.POST, "/api/v1/usuario/registro").permitAll()
+	                .requestMatchers(HttpMethod.POST, "/api/v1/autenticacion/login").permitAll()
+	                .requestMatchers(HttpMethod.POST, "/api/v1/autenticacion/refreshtoken").permitAll()
+	                .requestMatchers(HttpMethod.POST, "/api/v1/autenticacion/**").permitAll()
 	                .requestMatchers(
 	                        "/swagger/**",
 	                        "/swagger-ui/**",
