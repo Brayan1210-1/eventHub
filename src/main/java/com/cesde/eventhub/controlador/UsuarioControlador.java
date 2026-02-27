@@ -1,6 +1,6 @@
 package com.cesde.eventhub.controlador;
 
-import org.springframework.beans.factory.annotation.Autowired;
+/**import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,24 +25,8 @@ public class UsuarioControlador {
 	@Autowired
 	private JwtServicio jwtServicio;
 
-	@PostMapping("/registro")
-	public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioRegistroDTO usuario) {
-
-          try {
-            UsuarioRespuestaDTO usuarioCreado = usuarioServicio.crearCliente(usuario);
-            
-            String token = jwtServicio.generarAccessToken(
-                    usuarioCreado.getId(), 
-                    usuarioCreado.getEmail(), 
-                    usuarioCreado.getRol(),
-                    usuarioCreado.getNombre()
-                );
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(token);
-            } catch (RuntimeException runtimeException) {
-            	 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe un usuario con ese email, documento o teléfono");
-            }
-    }
-
+	
+  La comentaré porque todavía no es gestión de usuarios
 
 }
+**/
