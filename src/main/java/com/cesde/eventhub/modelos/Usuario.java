@@ -1,8 +1,10 @@
 package com.cesde.eventhub.modelos;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,15 +12,20 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -36,6 +43,9 @@ public class Usuario {
 	@Column(name = "documento", nullable = false, length = 20, unique = true)
 	private String documento;
 
+	@OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+	private RefreshToken refreshToken;
+	
 	@Email
 	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
@@ -58,38 +68,6 @@ public class Usuario {
 
 	@Column(name = "updatedAt", nullable = false)
 	private LocalDateTime updatedAt;
-
-	//Mega super increibles constructores
-	public Usuario() {
-
-	}
-
-	public Usuario(Long id, String nombre, String apellido, String documento, String email, String telefono,
-			String contrasena, RolesUsuario rol, Boolean activo, LocalDateTime createdAt, LocalDateTime updatedAt) {
-		this.id = id;
-		this.nombre = nombre;
-		this.apellido = apellido;
-		this.documento = documento;
-		this.email = email;
-		this.telefono = telefono;
-		this.contrasena = contrasena;
-		this.rol = rol;
-		this.activo = activo;
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
-	}
-
-	public Usuario(Long id, String nombre, String email, String contraseña, RolesUsuario rol, Boolean activo,
-			LocalDateTime createdAt, LocalDateTime updatedAt) {
-		this.id = id;
-		this.nombre = nombre;
-		this.email = email;
-		this.contrasena = contraseña;
-		this.rol = rol;
-		this.activo = activo;
-		this.createdAt =  LocalDateTime.now();
-		this.updatedAt =  LocalDateTime.now();
-	}
 
 	@PrePersist
 	  protected void onCreate() {

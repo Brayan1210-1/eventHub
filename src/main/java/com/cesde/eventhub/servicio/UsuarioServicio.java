@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.LoginDTO;
-import com.cesde.eventhub.dto.UsuarioDTO;
+import com.cesde.eventhub.dto.UsuarioRegistroDTO;
 import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
 import com.cesde.eventhub.mapper.UsuarioMapper;
@@ -25,9 +25,11 @@ public class UsuarioServicio {
 	
 	@Autowired
 	private UsuarioMapper usuarioMapper;
+	
+	
 
 	@Transactional
-	public UsuarioRespuestaDTO crearCliente(UsuarioDTO usuarioDTO) {
+	public UsuarioRespuestaDTO crearCliente(UsuarioRegistroDTO usuarioDTO) {
 
 		if(usuarioRepos.existsByEmail(usuarioDTO.getEmail()) || usuarioRepos.existsByDocumento(usuarioDTO.getDocumento())) {
 		throw new RuntimeException ("Ya existe un usuario con ese email o documento");
@@ -51,24 +53,28 @@ public class UsuarioServicio {
 	}
 
 	public UsuarioRespuestaDTO iniciarSesion(LoginDTO login) {
-		Optional<Usuario> usuarioOpcional = usuarioRepos.findByEmail(login.getEmail());  
 		
-		//Verificar que el usuario exista
-		if (!usuarioOpcional.isPresent()) {
-			throw new RuntimeException("No existe un usuario con ese email");
-		}
+		Usuario usuarioEncontrado = findByEmail(login.getEmail());
 		
-			
-		Usuario usuario = usuarioOpcional.get();
 		//mirar si la contraseña es correcta
-		if(!passwordEncoder.matches(login.getContrasena(), usuario.getContrasena())) {
+		if(!passwordEncoder.matches(login.getContrasena(), usuarioEncontrado.getContrasena())) {
 			throw new SecurityException("La contraseña es incorrecta");
 		}
 		
-		UsuarioRespuestaDTO usuarioRespuesta = usuarioMapper.haciaDto(usuario);
+		UsuarioRespuestaDTO usuarioRespuesta = usuarioMapper.haciaDto(usuarioEncontrado);
 		
 		return usuarioRespuesta;
 	}
 
+	public Usuario findByEmail(String email) {
+		
+		Optional<Usuario> usuarioABuscar = usuarioRepos.findByEmail(email);
+		if(!usuarioABuscar.isPresent()) {
+			throw new RuntimeException("No existe un usuario con ese email");
+		}
+		
+		Usuario usuario = usuarioABuscar.get();
+		return usuario;
+	}
 
 }

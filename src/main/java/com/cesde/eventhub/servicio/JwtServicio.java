@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+
 import javax.crypto.SecretKey;
 
 import java.util.Date;
@@ -27,11 +28,11 @@ public class JwtServicio {
 	 @Value("${jwt.refresh-expiration}")
 	 private long jwtRefresh;
 	 
-	 public String generarAccessToken(Long id, String email, String rol, String nombre) {
+	 public String generarAccessToken(Long id, String email, String role, String nombre) {
 	        Map<String, Object> claims = new HashMap<>();
 	        claims.put("id", id);
 	        claims.put("email", email);
-	        claims.put("rol", rol);
+	        claims.put("rol", role);
 	        claims.put("nombre", nombre);
 
 	        return Jwts.builder()
