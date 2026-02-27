@@ -1,7 +1,5 @@
 package com.cesde.eventhub.controlador;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.eventhub.dto.LoginDTO;
 import com.cesde.eventhub.dto.PeticionTokenRefresh;
 import com.cesde.eventhub.dto.RespuestaLoginDTO;
+import com.cesde.eventhub.dto.UsuarioRegistroDTO;
 import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
 import com.cesde.eventhub.modelos.RefreshToken;
 import com.cesde.eventhub.servicio.JwtServicio;
@@ -33,6 +32,26 @@ public class AuthControlador {
 	
 	@Autowired
 	private RefreshTokenServicio refreshTokenServicio;
+	
+	
+	@PostMapping("/registro")
+	public ResponseEntity<?> crearUsuario(@Valid @RequestBody UsuarioRegistroDTO usuario) {
+
+          try {
+            UsuarioRespuestaDTO usuarioCreado = usuarioServicio.crearCliente(usuario);
+            
+            String token = jwtServicio.generarAccessToken(
+                    usuarioCreado.getId(), 
+                    usuarioCreado.getEmail(), 
+                    usuarioCreado.getRol(),
+                    usuarioCreado.getNombre()
+                );
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(token);
+            } catch (RuntimeException runtimeException) {
+            	 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe un usuario con ese email, documento o teléfono");
+            }
+    }
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login){
