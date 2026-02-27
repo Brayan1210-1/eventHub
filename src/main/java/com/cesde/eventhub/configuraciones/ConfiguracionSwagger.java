@@ -10,7 +10,6 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.tags.Tag;
 
 @Configuration
 public class ConfiguracionSwagger {
@@ -36,12 +35,6 @@ public class ConfiguracionSwagger {
 	          .url("http://localhost:8081")
 	          .description("Servidor local")
 	        )
-	      )
-	      .tags(List.of(
-	        new Tag()
-	          .name("Gestión de usuarios")
-	          .description("administración básica de usuarios (leer,borrar,actualizar y crear) PARA ADMIN")
-	      )
-	    );
+	      );
 	  }
 }
