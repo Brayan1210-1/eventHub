@@ -34,9 +34,11 @@ public class AdminControlador {
 	@PostMapping("/crearlugar")
 	public ResponseEntity<?> crearLugar(@Valid @RequestBody LugarDTO lugar){
 	
-
+		try {
 		return ResponseEntity.status(HttpStatus.OK).body(lugarServicio.crearLugar(lugar));
-		
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Debe ingresar todos los campos");
+		}
 	}
 	
 	@GetMapping("/lugaresactivos")
