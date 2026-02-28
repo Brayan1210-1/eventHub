@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CrearLugarDTO {
+public class LugarDTO {
 	
 	@NotBlank(message = "El nombre es obligatorio")
 	private String nombre;
