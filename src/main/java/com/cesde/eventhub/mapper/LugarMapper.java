@@ -2,7 +2,9 @@ package com.cesde.eventhub.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
+import com.cesde.eventhub.dto.ActualizarLugarDTO;
 import com.cesde.eventhub.dto.LugarDTO;
 import com.cesde.eventhub.modelos.Lugar;
 
@@ -16,4 +18,14 @@ public interface LugarMapper {
 	Lugar haciaEntidad(LugarDTO crearLugar);
 	
 	LugarDTO haciaDto(Lugar lugar);
+	
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "createdAt", ignore = true)
+	@Mapping(target = "updatedAt", ignore = true)
+	Lugar haciaEntidadAct(ActualizarLugarDTO actualizarLugar);
+	
+	ActualizarLugarDTO haciaDTOAct(Lugar lugar);
+	
+     //usar MappingTarget
+	
 }

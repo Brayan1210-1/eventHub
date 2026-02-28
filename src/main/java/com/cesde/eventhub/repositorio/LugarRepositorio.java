@@ -2,6 +2,8 @@ package com.cesde.eventhub.repositorio;
 
 
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +17,6 @@ import com.cesde.eventhub.modelos.Lugar;
 public interface LugarRepositorio extends JpaRepository<Lugar, Long>{
 
 	public Page<Lugar> findByActivoTrue(Pageable pageable);
+	
+	public Optional<Lugar> findById(Long id);
 }
