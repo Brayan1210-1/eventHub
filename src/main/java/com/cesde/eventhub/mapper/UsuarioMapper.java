@@ -3,8 +3,8 @@ package com.cesde.eventhub.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.cesde.eventhub.dto.UsuarioRegistroDTO;
-import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
+import com.cesde.eventhub.dto.request.UsuarioRegistroDTO;
+import com.cesde.eventhub.dto.response.UsuarioRespuestaDTO;
 import com.cesde.eventhub.modelos.Usuario;
 
 @Mapper(componentModel = "spring")

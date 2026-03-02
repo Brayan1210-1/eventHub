@@ -9,25 +9,25 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cesde.eventhub.modelos.RefreshToken;
 import com.cesde.eventhub.modelos.Usuario;
 import com.cesde.eventhub.repositorio.RefreshTokenRepositorio;
-import com.cesde.eventhub.dto.RespuestaLoginDTO;
-import com.cesde.eventhub.dto.UsuarioRespuestaDTO;
+
+import lombok.RequiredArgsConstructor;
+
+import com.cesde.eventhub.dto.response.RespuestaLoginDTO;
+import com.cesde.eventhub.dto.response.UsuarioRespuestaDTO;
 import com.cesde.eventhub.mapper.UsuarioMapper;
 
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenServicio {
 	
-	    @Autowired
-	    private RefreshTokenRepositorio refreshTokenRepositorio;
+	    private final RefreshTokenRepositorio refreshTokenRepositorio;
 	    
-	    @Autowired
-	    private UsuarioMapper mapper;
+	    private final UsuarioMapper mapper;
 
-	    @Autowired
-	    private JwtServicio jwtServicio;
-	    
-	    @Autowired
-	    private UsuarioServicio usuarioServ;
+	    private final JwtServicio jwtServicio;
+	   
+	    private final UsuarioServicio usuarioServ;
 
 	    @Value("${jwt.refresh-expiration}")
 		 private long jwtRefresh;
@@ -37,7 +37,7 @@ public class RefreshTokenServicio {
 	        	Usuario usuarioEntity = usuarioServ.findByEmail(usuario.getEmail());
 
 	            // Generar refresh token con JwtServicio
-	            String refreshTokenJwt = jwtServicio.generarRefreshToken(usuario.getEmail());
+	            String refreshTokenJwt = jwtServicio.generarRefreshToken(usuario.getId());
 
 	            RefreshToken refreshToken = new RefreshToken();
 	            refreshToken.setUsuario(usuarioEntity);
@@ -91,8 +91,8 @@ public class RefreshTokenServicio {
 	String nuevoAccess = jwtServicio.generarAccessToken(
 	        						usuarioT.getId(),
 	                				usuarioT.getEmail(),
-	                				usuarioT.getRol(),
-	                				usuarioT.getNombre()); 
+	                				usuarioT.getRol()
+	                				); 
 	        
 	        return new RespuestaLoginDTO(nuevoRefresh.getToken(), nuevoAccess);
 	        

@@ -15,21 +15,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cesde.eventhub.dto.ActualizarLugarDTO;
 import com.cesde.eventhub.dto.LugarDTO;
+import com.cesde.eventhub.dto.request.ActualizarLugarDTO;
 import com.cesde.eventhub.modelos.Lugar;
 import com.cesde.eventhub.servicio.LugarServicio;
 
 import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/admin")
 public class AdminControlador {
 	
-	@Autowired
-	private LugarServicio lugarServicio;
+	
+	private final LugarServicio lugarServicio;
  
 	@PostMapping("/crearlugar")
 	public ResponseEntity<?> crearLugar(@Valid @RequestBody LugarDTO lugar){

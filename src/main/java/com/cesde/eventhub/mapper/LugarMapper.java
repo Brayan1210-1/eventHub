@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.cesde.eventhub.dto.ActualizarLugarDTO;
 import com.cesde.eventhub.dto.LugarDTO;
+import com.cesde.eventhub.dto.request.ActualizarLugarDTO;
 import com.cesde.eventhub.modelos.Lugar;
 
 @Mapper(componentModel = "spring")
