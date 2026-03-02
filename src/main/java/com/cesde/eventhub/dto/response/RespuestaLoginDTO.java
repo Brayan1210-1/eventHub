@@ -1,4 +1,4 @@
-package com.cesde.eventhub.dto;
+package com.cesde.eventhub.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

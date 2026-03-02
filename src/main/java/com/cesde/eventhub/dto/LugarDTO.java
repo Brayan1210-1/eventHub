@@ -22,7 +22,7 @@ public class LugarDTO {
 	@Size(min = 5, message = "La ciudad debe tener mas de 5 caracteres")
 	private String ciudad;
 	
-	@NotNull
+	@NotNull(message = "La capacidad no puede ser nula")
 	private Integer capacidad_total;
 	
 	private String descripcion;

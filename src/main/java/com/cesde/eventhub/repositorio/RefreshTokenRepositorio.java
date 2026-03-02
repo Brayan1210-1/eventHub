@@ -1,6 +1,7 @@
 package com.cesde.eventhub.repositorio;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,7 +17,7 @@ public interface RefreshTokenRepositorio extends JpaRepository<RefreshToken, Lon
 
 	Optional<RefreshToken> findByToken(String token);
 	
-	Optional<RefreshToken> findByUsuarioId(Long id);
+	Optional<RefreshToken> findByUsuarioId(UUID id);
 	
 	@Modifying
 	@Query("DELETE FROM RefreshToken rt WHERE rt.usuario = :usuario ")

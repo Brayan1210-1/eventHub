@@ -1,6 +1,8 @@
 package com.cesde.eventhub.modelos;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import com.cesde.eventhub.enumeraciones.RolesUsuario;
 
@@ -10,7 +12,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -31,8 +32,9 @@ import lombok.Setter;
 public class Usuario {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@GeneratedValue
+	@UuidGenerator
+	private UUID id;
 
 	@Column(name = "nombre", nullable = false, length = 50)
 	private String nombre;

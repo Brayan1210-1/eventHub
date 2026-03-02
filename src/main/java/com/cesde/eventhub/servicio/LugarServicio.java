@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
-import com.cesde.eventhub.dto.ActualizarLugarDTO;
 import com.cesde.eventhub.dto.LugarDTO;
+import com.cesde.eventhub.dto.request.ActualizarLugarDTO;
 import com.cesde.eventhub.mapper.LugarMapper;
 import com.cesde.eventhub.modelos.Lugar;
 import com.cesde.eventhub.repositorio.LugarRepositorio;
@@ -25,6 +25,11 @@ public class LugarServicio {
 
 	@Secured("ROLE_ADMIN")
 	public LugarDTO crearLugar(LugarDTO lugar) {
+		
+		//if(lugar.getCapacidad_total() == null || lugar.getCiudad() == null || lugar.getDireccion() == null
+			//	|| lugar.getNombre() == null) {
+			//throw new RuntimeException("Los campos capacidad, ciudad, direccion y nombre no pueden ser nulos");
+		//}
 		
 		Lugar lugarGuardar = mapper.haciaEntidad(lugar);
 		lugarGuardar.setActivo(true);
@@ -48,6 +53,7 @@ public class LugarServicio {
 			throw new RuntimeException("No existe un lugar con el id: " + id);
 		}
 		
+		//USAR MAPSTRUCT
 		Lugar lugarEncontrado = lugarOpcional.get();
 		
 		lugarEncontrado.setNombre(lugarAct.getNombre());
