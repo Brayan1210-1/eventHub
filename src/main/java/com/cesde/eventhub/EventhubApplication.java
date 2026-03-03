@@ -8,9 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.cesde.eventhub.enumeraciones.RolesUsuario;
-import com.cesde.eventhub.modelos.Usuario;
-import com.cesde.eventhub.repositorio.UsuarioRepositorio;
+import com.cesde.eventhub.entity.User;
+import com.cesde.eventhub.enums.UserRoles;
+import com.cesde.eventhub.repository.UserRepository;
 
 @SpringBootApplication
 public class EventhubApplication {
@@ -20,7 +20,7 @@ public class EventhubApplication {
 	}
 	
 	 @Bean
-	    public CommandLineRunner initData(UsuarioRepositorio usuarioRepo,
+	    public CommandLineRunner initData(UserRepository usuarioRepo,
 	                                      PasswordEncoder passwordEncoder) {
 	        return args -> {
 	        	
@@ -28,7 +28,7 @@ public class EventhubApplication {
 	        	
 	        	if(usuarioRepo.findByEmail(emailAdmin).isEmpty()) {
 	        		
-	            Usuario admin = new Usuario();
+	            User admin = new User();
 	            admin.setNombre("PrimerAdmin");
 	            admin.setApellido("Quejada");
 	            admin.setEmail(emailAdmin);
@@ -36,7 +36,7 @@ public class EventhubApplication {
 	            admin.setDocumento("1038384953");
 	            admin.setActivo(true);
 	            admin.setContrasena(passwordEncoder.encode("Admin123"));
-	            admin.setRol(RolesUsuario.ADMIN);
+	            admin.setRol(UserRoles.ADMIN);
 	           
 	            usuarioRepo.save(admin);
 	            System.out.println("El admin hace aparición");
