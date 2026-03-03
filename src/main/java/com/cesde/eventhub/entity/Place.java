@@ -28,25 +28,25 @@ public class Place{
 	private Long id;
 	
 	@Column(name = "nombre", length = 40, nullable = false)
-	private String nombre;
+	private String name;
 	
 	@Column(name = "direccion", length = 60, nullable = false)
-	private String direccion;
+	private String address;
 	
 	@Column(name = "ciudad", length = 70, nullable = false)
-	private String ciudad;
+	private String city;
 	
 	@Column(name = "capacidad_total", nullable = false)
-	private Integer capacidad_total;
+	private Integer total_capacity;
 	
 	@Column(name = "descripcion")
-	private String descripcion;
+	private String description;
 	
 	@Column(name = "imagen_url")
-	private String imagenUrl;
+	private String imageUrl;
 	
 	@Column(name = "activo", nullable = false)
-	private Boolean activo;
+	private Boolean active;
 	
 	@Column(name = "createdAt")
 	private LocalDateTime createdAt;

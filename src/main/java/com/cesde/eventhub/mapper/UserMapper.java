@@ -11,8 +11,8 @@ import com.cesde.eventhub.entity.User;
 public interface UserMapper {
 
 	@Mapping(target = "id", ignore = true)
-    @Mapping(target = "rol", ignore = true)
-    @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
 	@Mapping(target = "refreshToken", ignore = true)

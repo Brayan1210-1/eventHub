@@ -21,64 +21,64 @@ public class PlaceService {
 	
 	private final PlaceMapper mapper;
 	
-	private final PlaceRepository lugarRepositorio;
+	private final PlaceRepository placeRepository;
 
 	@Secured("ROLE_ADMIN")
-	public PlaceDTO crearLugar(PlaceDTO lugar) {
+	public PlaceDTO createPlace(PlaceDTO place) {
 		
 		//if(lugar.getCapacidad_total() == null || lugar.getCiudad() == null || lugar.getDireccion() == null
 			//	|| lugar.getNombre() == null) {
 			//throw new RuntimeException("Los campos capacidad, ciudad, direccion y nombre no pueden ser nulos");
 		//}
 		
-		Place lugarGuardar = mapper.haciaEntidad(lugar);
-		lugarGuardar.setActivo(true);
-		Place lugarGuardado = lugarRepositorio.save(lugarGuardar);
+		Place placeToSave = mapper.toEntity(place);
+		placeToSave.setActive(true);
+		Place placeSaved = placeRepository.save(placeToSave);
 		
-		return mapper.haciaDto(lugarGuardado);
+		return mapper.toDTO(placeSaved);
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public Page<Place> lugaresActivos(Pageable pageable){
+	public Page<Place> activesPlaces(Pageable pageable){
 	
-		return lugarRepositorio.findByActivoTrue(pageable);
+		return placeRepository.findByActiveTrue(pageable);
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public UpdatePlaceDTO actualizarLugar(Long id, UpdatePlaceDTO lugarAct) {
+	public UpdatePlaceDTO updatePlace(Long id, UpdatePlaceDTO place) {
 		
-		Optional<Place> lugarOpcional = lugarRepositorio.findById(id);
+		Optional<Place> optionalPlace = placeRepository.findById(id);
 		
-		if(!lugarOpcional.isPresent()) {
+		if(!optionalPlace.isPresent()) {
 			throw new RuntimeException("No existe un lugar con el id: " + id);
 		}
 		
 		//USAR MAPSTRUCT
-		Place lugarEncontrado = lugarOpcional.get();
+		Place foundPlace = optionalPlace.get();
 		
-		lugarEncontrado.setNombre(lugarAct.getNombre());
-		lugarEncontrado.setCiudad(lugarAct.getCiudad());
-		lugarEncontrado.setCapacidad_total(lugarAct.getCapacidad_total());
-		lugarEncontrado.setDescripcion(lugarAct.getDescripcion());
-		lugarEncontrado.setDireccion(lugarAct.getDireccion());
-		lugarEncontrado.setActivo(lugarAct.getActivo());
-		lugarEncontrado.setImagenUrl(lugarAct.getImagenUrl());
+		foundPlace.setName(place.getName());
+		foundPlace.setCity(place.getCity());
+		foundPlace.setTotal_capacity(place.getTotal_capacity());
+		foundPlace.setDescription(place.getDescription());
+		foundPlace.setAddress(place.getAddress());
+		foundPlace.setActive(place.getActive());
+		foundPlace.setImageUrl(place.getImageUrl());
 		
-		lugarRepositorio.save(lugarEncontrado);
+		placeRepository.save(foundPlace);
 		
-		return mapper.haciaDTOAct(lugarEncontrado);
+		return mapper.toDTOUpdate(foundPlace);
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public void eliminarLugar(Long id) {
+	public void deletePlace(Long id) {
 		
-		Optional<Place> lugarABorrar = lugarRepositorio.findById(id);
-		if(lugarABorrar.isEmpty()) {
+		Optional<Place> optionalPlace = placeRepository.findById(id);
+		if(optionalPlace.isEmpty()) {
 			throw new RuntimeException("No se pudo encontrar el lugar con id: "+ id);
 		}
 		
-		Place lugarBorrado = lugarABorrar.get();	
-		lugarRepositorio.delete(lugarBorrado);
+		Place deletedPlace = optionalPlace.get();	
+		placeRepository.delete(deletedPlace);
 	}
 	
 	

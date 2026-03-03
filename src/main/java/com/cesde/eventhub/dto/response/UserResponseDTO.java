@@ -14,10 +14,10 @@ import lombok.Setter;
 public class UserResponseDTO {
 	
 	private UUID id;
-	private String nombre;
-	private String rol;
-    private String apellido;
+	private String name;
+	private String roles;
+    private String lastName;
     private String email;
-    private String documento;
-    private String telefono;
+    private String document;
+    private String phone;
 }

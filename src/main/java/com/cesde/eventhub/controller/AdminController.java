@@ -1,8 +1,5 @@
 package com.cesde.eventhub.controller;
 
-
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,38 +28,40 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	
-	private final PlaceService lugarServicio;
+	private final PlaceService placeService;
  
 	@PostMapping("/crearlugar")
-	public ResponseEntity<?> crearLugar(@Valid @RequestBody PlaceDTO lugar){
+	public ResponseEntity<?> createPlace(@Valid @RequestBody PlaceDTO place){
 	
 		try {
-		return ResponseEntity.status(HttpStatus.OK).body(lugarServicio.crearLugar(lugar));
+		return ResponseEntity.status(HttpStatus.OK).body(placeService.createPlace(place));
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Debe ingresar todos los campos");
 		}
 	}
 	
 	@GetMapping("/lugaresactivos")
-	public ResponseEntity<Page<Place>> lugaresActivos(Pageable pageable){
-		return ResponseEntity.ok(lugarServicio.lugaresActivos(pageable));
+	public ResponseEntity<Page<Place>> activesPlaces(Pageable pageable){
+		return ResponseEntity.ok(placeService.activesPlaces(pageable));
 	}
 	
 	@PutMapping("/actualizarlugar/{id}")
-	public ResponseEntity<?> actualizarLugar(
+	public ResponseEntity<?> updatePlace(
 	        @PathVariable Long id,
-	        @RequestBody @Valid UpdatePlaceDTO lugarDTO) {
+	        @RequestBody @Valid UpdatePlaceDTO placeDTO) {
+		
 		try {
-			return ResponseEntity.status(HttpStatus.OK).body(lugarServicio.actualizarLugar(id, lugarDTO));
+			return ResponseEntity.status(HttpStatus.OK).body(placeService.updatePlace(id, placeDTO));
 		} catch (RuntimeException e) {
          return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe un lugar con ese id");
 	    }
+		
 	 }
 	
 	@DeleteMapping("eliminarlugar/{id}")
-    public ResponseEntity<?> eliminarLugar(@PathVariable Long id){
+    public ResponseEntity<?> deletePlace(@PathVariable Long id){
 		try {
-			lugarServicio.eliminarLugar(id);
+			placeService.deletePlace(id);
 			  return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado correctamente");
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe un lugar con ese id");

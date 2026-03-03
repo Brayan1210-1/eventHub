@@ -13,21 +13,21 @@ import lombok.Setter;
 public class PlaceDTO {
 	
 	@NotBlank(message = "El nombre es obligatorio")
-	private String nombre;
+	private String name;
 	
 	@NotBlank(message = "La direccion es obligatoria")
-	private String direccion;
+	private String address;
 	
 	@NotBlank(message = "La ciudad no puede ser nula")
 	@Size(min = 5, message = "La ciudad debe tener mas de 5 caracteres")
-	private String ciudad;
+	private String city;
 	
 	@NotNull(message = "La capacidad no puede ser nula")
-	private Integer capacidad_total;
+	private Integer total_capacity;
 	
-	private String descripcion;
+	private String description;
 	
 	
-	private String imagenUrl;
+	private String imageUrl;
 	
 }

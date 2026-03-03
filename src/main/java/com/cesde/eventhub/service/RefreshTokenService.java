@@ -1,7 +1,6 @@
 package com.cesde.eventhub.service;
 
 import java.time.Instant;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,54 +19,54 @@ import com.cesde.eventhub.repository.RefreshTokenRepository;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 	
-	    private final RefreshTokenRepository refreshTokenRepositorio;
+	    private final RefreshTokenRepository refreshTokenRepository;
 	    
-	    private final UserMapper mapper;
+	    private final UserMapper userMapper;
 
-	    private final JwtService jwtServicio;
+	    private final JwtService jwtService;
 	   
-	    private final UserService usuarioServ;
+	    private final UserService userService;
 
 	    @Value("${jwt.refresh-expiration}")
 		 private long jwtRefresh;
 	    
-	        public RefreshToken crearRefreshToken(UserResponseDTO usuario) {
+	        public RefreshToken createRefreshToken(UserResponseDTO user) {
 	        	
-	        	User usuarioEntity = usuarioServ.findByEmail(usuario.getEmail());
+	        	User userEntity = userService.findByEmail(user.getEmail());
 
 	            // Generar refresh token con JwtServicio
-	            String refreshTokenJwt = jwtServicio.generarRefreshToken(usuario.getId());
+	            String refreshTokenJwt = jwtService.generateRefreshToken(user.getId());
 
 	            RefreshToken refreshToken = new RefreshToken();
-	            refreshToken.setUsuario(usuarioEntity);
+	            refreshToken.setUser(userEntity);
 	            refreshToken.setToken(refreshTokenJwt);
-	            refreshToken.setFechaExpiracion(
+	            refreshToken.setExpirationDate(
 	                Instant.now().plusMillis(jwtRefresh) 
 	            );
 
-	            return refreshTokenRepositorio.save(refreshToken);
+	            return refreshTokenRepository.save(refreshToken);
 	        }
 	        
 	        @Transactional
-	        private RefreshToken rotarRefreshToken(RefreshToken tokenActual) {
+	        private RefreshToken rotateRefreshToken(RefreshToken currentToken) {
 
-		        User usuario = tokenActual.getUsuario();
-		        UserResponseDTO usuarioToken = mapper.haciaDto(usuario);	 
+		        User user = currentToken.getUser();
+		        UserResponseDTO userToken = userMapper.haciaDto(user);	 
 
-		        refreshTokenRepositorio.deleteByUsuario(tokenActual.getUsuario());
+		        refreshTokenRepository.deleteByUsuario(currentToken.getUser());
 		        
-		        RefreshToken nuevoRefreshToken = crearRefreshToken(usuarioToken);
+		        RefreshToken nuevoRefreshToken = createRefreshToken(userToken);
 
 		        return nuevoRefreshToken;
 		    }
 	        
-	        private RefreshToken validarRefreshToken(String refreshToken) {
+	        private RefreshToken validateRefreshToken(String refreshToken) {
 
-		        RefreshToken token = refreshTokenRepositorio.findByToken(refreshToken)
+		        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
 		                .orElseThrow(() -> new RuntimeException("Token inválido"));
 
-		        if (token.estaExpirado()) {
-		            refreshTokenRepositorio.deleteByFechaExpiracion();
+		        if (token.isExpired()) {
+		            refreshTokenRepository.deleteByexpirationDate();;
 		            throw new RuntimeException("Token expirado");
 		        }
 
@@ -76,24 +75,24 @@ public class RefreshTokenService {
 
 
          @Transactional
-	    public ResponseLoginDTO renovarAccessToken(String refreshToken) {
+	    public ResponseLoginDTO renovateAccessToken(String refreshToken) {
 	    	
-	       RefreshToken tokenValido = validarRefreshToken(refreshToken);
+	       RefreshToken validToken = validateRefreshToken(refreshToken);
 
-	        User usuario = tokenValido.getUsuario();
+	        User user = validToken.getUser();
 	        
-	        UserResponseDTO usuarioT = mapper.haciaDto(usuario);
+	        UserResponseDTO userDTO = userMapper.haciaDto(user);
 	        
-	        RefreshToken nuevoRefresh = rotarRefreshToken(tokenValido);
+	        RefreshToken newRefresh = rotateRefreshToken(validToken);
 	      
 	        //CAMBIAR AUTH CONTROLADOR
-	String nuevoAccess = jwtServicio.generarAccessToken(
-	        						usuarioT.getId(),
-	                				usuarioT.getEmail(),
-	                				usuarioT.getRol()
+	String newAccess = jwtService.generateAccessToken(
+	        						userDTO.getId(),
+	                				userDTO.getEmail(),
+	                				userDTO.getRoles()
 	                				); 
 	        
-	        return new ResponseLoginDTO(nuevoRefresh.getToken(), nuevoAccess);
+	        return new ResponseLoginDTO(newRefresh.getToken(), newAccess);
 	        
 	    }
 	    

@@ -1,6 +1,5 @@
 package com.cesde.eventhub.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,22 +26,22 @@ import lombok.RequiredArgsConstructor;
 public class AuthControlador {
 
 	
-	private final UserService usuarioServicio;
+	private final UserService userService;
 
 
-	private final JwtService jwtServicio;
+	private final JwtService jwtService;
 
 
-	private final RefreshTokenService refreshTokenServicio;
+	private final RefreshTokenService refreshTokenService;
 
 	@PostMapping("/registro")
-	public ResponseEntity<?> crearUsuario(@Valid @RequestBody UserRegisterDTO usuario) {
+	public ResponseEntity<?> createUser(@Valid @RequestBody UserRegisterDTO user) {
 
 		try {
-			UserResponseDTO usuarioCreado = usuarioServicio.crearCliente(usuario);
+			UserResponseDTO userCreate = userService.createClient(user);
 
-			String token = jwtServicio.generarAccessToken(usuarioCreado.getId(), usuarioCreado.getEmail(),
-					usuarioCreado.getRol());
+			String token = jwtService.generateAccessToken(userCreate.getId(), userCreate.getEmail(),
+					userCreate.getRoles());
 
 			return ResponseEntity.status(HttpStatus.CREATED).body(token);
 		} catch (RuntimeException runtimeException) {
@@ -52,17 +51,17 @@ public class AuthControlador {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> iniciarSesion(@Valid @RequestBody LoginDTO login) {
+	public ResponseEntity<?> login(@Valid @RequestBody LoginDTO login) {
 
 		try {
-			UserResponseDTO usuario = usuarioServicio.iniciarSesion(login);
+			UserResponseDTO user = userService.iniciarSesion(login);
 
-	    String accessToken = jwtServicio.generarAccessToken(
-	    		usuario.getId(), 
-			usuario.getEmail(), 
-			usuario.getRol());
+	    String accessToken = jwtService.generateAccessToken(
+	    		user.getId(), 
+			user.getEmail(), 
+			user.getRoles());
 
-			RefreshToken refreshToken = refreshTokenServicio.crearRefreshToken(usuario);
+			RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
 			// Añadir clase para manejo de excepciones
 			return ResponseEntity.status(HttpStatus.OK)
@@ -75,11 +74,11 @@ public class AuthControlador {
 	}
 
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<?> refrescarToken(@Valid @RequestBody RequestTokenRefresh token) {
+	public ResponseEntity<?> refreshToken(@Valid @RequestBody RequestTokenRefresh token) {
 		try {
-			ResponseLoginDTO nuevosTokens = refreshTokenServicio.renovarAccessToken(token.getTokenRefresh());
+			ResponseLoginDTO newTokens = refreshTokenService.renovateAccessToken(token.getTokenRefresh());
 
-			return ResponseEntity.status(HttpStatus.OK).body(nuevosTokens);
+			return ResponseEntity.status(HttpStatus.OK).body(newTokens);
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		}

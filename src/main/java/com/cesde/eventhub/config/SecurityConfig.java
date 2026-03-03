@@ -45,7 +45,7 @@ public class SecurityConfig {
 	             
 	            .authorizeHttpRequests(auth -> auth
 	                .requestMatchers(HttpMethod.POST, "/api/v1/autenticacion/**").permitAll()
-	                .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasRole("ADMIN")
+	                .requestMatchers( "/api/v1/admin/**").hasRole("ADMIN")
 	                .requestMatchers(
 	                        "/swagger/**",
 	                        "/swagger-ui/**",

@@ -29,11 +29,11 @@ public class JwtService {
 	 @Value("${jwt.refresh-expiration}")
 	 private long jwtRefresh;
 	 
-	 public String generarAccessToken(UUID id, String email, String role) {
+	 public String generateAccessToken(UUID id, String email, String roles) {
 	        Map<String, Object> claims = new HashMap<>();
 	        claims.put("id", id);
 	        claims.put("email", email);
-	        claims.put("rol", role);
+	        claims.put("roles", roles);
 	        
 	        
 	        String accessToken = Jwts.builder()
@@ -51,7 +51,7 @@ public class JwtService {
 	        return accessToken;
 	    }
 	 
-	 public String generarRefreshToken(UUID id) {
+	 public String generateRefreshToken(UUID id) {
 		 
 		 String refreshToken =Jwts.builder()
 				 
