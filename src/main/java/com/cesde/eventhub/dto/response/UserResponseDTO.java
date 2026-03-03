@@ -1,6 +1,9 @@
 package com.cesde.eventhub.dto.response;
 
+import java.util.Set;
 import java.util.UUID;
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +18,7 @@ public class UserResponseDTO {
 	
 	private UUID id;
 	private String name;
-	private String roles;
+	private Set<String> roles;
     private String lastName;
     private String email;
     private String document;

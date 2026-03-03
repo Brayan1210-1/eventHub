@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class JwtService {
 	 @Value("${jwt.refresh-expiration}")
 	 private long jwtRefresh;
 	 
-	 public String generateAccessToken(UUID id, String email, String roles) {
+	 public String generateAccessToken(UUID id, String email, Collection<String> roles) {
 	        Map<String, Object> claims = new HashMap<>();
 	        claims.put("id", id);
 	        claims.put("email", email);
