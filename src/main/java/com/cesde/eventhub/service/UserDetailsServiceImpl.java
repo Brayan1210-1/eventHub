@@ -35,11 +35,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       
      }
     	
+    	String[] rolesName = user.getRoles().stream()
+    			.map(role -> role.getNameRole().name())
+    			.toArray(String[]::new);
+    	
     	
     	return org.springframework.security.core.userdetails.User
                 .withUsername(user.getId().toString())
                 .password(user.getPassword())
-                .roles(user.getRoles().name())
+                .roles(rolesName)
                 .build();
     }
     

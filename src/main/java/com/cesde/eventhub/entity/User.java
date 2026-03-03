@@ -1,18 +1,20 @@
 package com.cesde.eventhub.entity;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
-import com.cesde.eventhub.enums.UserRoles;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -36,13 +38,13 @@ public class User {
 	@UuidGenerator
 	private UUID id;
 
-	@Column(name = "nombre", nullable = false, length = 50)
+	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
-	@Column(name = "apellido", nullable = false, length = 50)
+	@Column(name = "lastName", nullable = false, length = 50)
 	private String lastName;
 
-	@Column(name = "documento", nullable = false, length = 20, unique = true)
+	@Column(name = "document", nullable = false, length = 20, unique = true)
 	private String document;
 
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,23 +54,28 @@ public class User {
 	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
 
-	@Column(name = "telefono", length = 30, unique = true, nullable = false)
+	@Column(name = "phone", length = 30, unique = true)
 	private String phone;
 
-	@Column(name = "contrasena", nullable = false)
+	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "rol", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private UserRoles roles;
-
+	@ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(referencedColumnName = "id")
+    )
+    private Set<Role> roles = new HashSet<>();
+	
+	
 	@Column(name = "activo", nullable = false)
 	private Boolean active;
 
-	@Column(name = "createdAt", nullable = false, updatable = false)
+	@Column(name = "created_At", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	@Column(name = "updatedAt", nullable = false)
+	@Column(name = "updated_At", nullable = false)
 	private LocalDateTime updatedAt;
 
 	@PrePersist

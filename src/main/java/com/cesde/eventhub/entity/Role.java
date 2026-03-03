@@ -1,44 +1,37 @@
 package com.cesde.eventhub.entity;
 
-import java.time.Instant;
+import com.cesde.eventhub.enums.UserRoles;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "refresh_tokens")
-public class RefreshToken {
+@Table(name = "roles")
+public class Role {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@OneToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "roles")
+	private UserRoles nameRole;
 	
-	@Column(name = "token", nullable = false, unique = true)
-	private String token;
-	
-	@Column(name = "expirationDate", nullable = false)
-	private Instant expirationDate;
-	
-	public boolean isExpired() {
-		return Instant.now().isAfter(this.expirationDate);
+	public Role(UserRoles role) {
+		this.nameRole = role;
 	}
 }

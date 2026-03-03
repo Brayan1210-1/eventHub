@@ -27,25 +27,25 @@ public class Place{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "nombre", length = 40, nullable = false)
+	@Column(name = "name", length = 40, nullable = false)
 	private String name;
 	
-	@Column(name = "direccion", length = 60, nullable = false)
+	@Column(name = "address", length = 60, nullable = false)
 	private String address;
 	
-	@Column(name = "ciudad", length = 70, nullable = false)
+	@Column(name = "city", length = 70, nullable = false)
 	private String city;
 	
-	@Column(name = "capacidad_total", nullable = false)
+	@Column(name = "total_capacity", nullable = false)
 	private Integer total_capacity;
 	
-	@Column(name = "descripcion")
+	@Column(name = "description")
 	private String description;
 	
-	@Column(name = "imagen_url")
+	@Column(name = "image_url")
 	private String imageUrl;
 	
-	@Column(name = "activo", nullable = false)
+	@Column(name = "active", nullable = false)
 	private Boolean active;
 	
 	@Column(name = "createdAt")

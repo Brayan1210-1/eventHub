@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cesde.eventhub.dto.LoginDTO;
 import com.cesde.eventhub.dto.request.UserRegisterDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
+import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.UserRoles;
 import com.cesde.eventhub.mapper.UserMapper;
+import com.cesde.eventhub.repository.RoleRepository;
 import com.cesde.eventhub.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +25,10 @@ public class UserService {
 
 	private final UserRepository userRepository;
 
+	private final RoleRepository roleRepository;
 
 	private final PasswordEncoder passwordEncoder;
 	
-
 	private final UserMapper userMapper;
 	
 	
@@ -41,7 +43,10 @@ public class UserService {
 
 		User userToSave = userMapper.haciaEntidad(userDTO);
 		
-		userToSave.setRoles(UserRoles.CLIENTE);
+		Role clientRole = roleRepository.findByNameRole(UserRoles.CLIENTE)
+                .orElseThrow(() -> new RuntimeException("Error: El rol CLIENTE no está configurado en la base de datos."));
+		
+		userToSave.getRoles().add(clientRole);
 		userToSave.setActive(true);
 
 		//CIFRAR y asignar contraseña
