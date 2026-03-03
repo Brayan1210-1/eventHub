@@ -17,13 +17,13 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
 	Optional<RefreshToken> findByToken(String token);
 	
-	Optional<RefreshToken> findByUsuarioId(UUID id);
+	Optional<RefreshToken> findByUserId(UUID id);
 	
 	@Modifying
-	@Query("DELETE FROM RefreshToken rt WHERE rt.usuario = :usuario ")
-	void deleteByUsuario (@Param("usuario") User usuario);
+	@Query("DELETE FROM RefreshToken rt WHERE rt.user = :user ")
+	void deleteByUsuario (@Param("usuario") User user);
 	
 	@Modifying
-	@Query("DELETE FROM RefreshToken rt WHERE rt.fechaExpiracion < CURRENT_TIMESTAMP")
-	void deleteByFechaExpiracion();
+	@Query("DELETE FROM RefreshToken rt WHERE rt.expirationDate < CURRENT_TIMESTAMP")
+	void deleteByexpirationDate();
 }

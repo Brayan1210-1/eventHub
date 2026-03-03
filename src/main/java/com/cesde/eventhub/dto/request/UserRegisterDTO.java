@@ -14,23 +14,23 @@ import lombok.Setter;
 public class UserRegisterDTO {
 
 	@NotBlank
-	private String nombre;
+	private String name;
 
 	@NotBlank
-	private String apellido;
+	private String lastName;
 
 	@Email
 	@NotBlank
 	private String email;
 
 	@NotBlank
-	private String contrasena;
+	private String password;
 
 	@NotBlank
-	private String documento;
+	private String document;
 
 	@NotBlank
-	private String telefono;
+	private String phone;
 
 
 }

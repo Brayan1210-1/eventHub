@@ -16,24 +16,24 @@ import lombok.Setter;
 public class UpdatePlaceDTO {
 		
 		@NotBlank(message = "El nombre es obligatorio")
-		private String nombre;
+		private String name;
 		
 		@NotBlank(message = "La direccion es obligatoria")
-		private String direccion;
+		private String address;
 		
 		@NotBlank(message = "La ciudad no puede ser nula")
 		@Size(min = 5, message = "La ciudad debe tener mas de 5 caracteres")
-		private String ciudad;
+		private String city;
 		
 		@NotNull
 		@Min(value = 1, message = "La capacidad debe ser positiva")
-		private Integer capacidad_total;
+		private Integer total_capacity;
 		
-		private String descripcion;
+		private String description;
 		
-		private String imagenUrl;
+		private String imageUrl;
 		
 		@NotNull(message = "Debe haber un estado")
-		private Boolean activo;
+		private Boolean active;
 
 }

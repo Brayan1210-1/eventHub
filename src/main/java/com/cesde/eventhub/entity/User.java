@@ -37,15 +37,15 @@ public class User {
 	private UUID id;
 
 	@Column(name = "nombre", nullable = false, length = 50)
-	private String nombre;
+	private String name;
 
 	@Column(name = "apellido", nullable = false, length = 50)
-	private String apellido;
+	private String lastName;
 
 	@Column(name = "documento", nullable = false, length = 20, unique = true)
-	private String documento;
+	private String document;
 
-	@OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private RefreshToken refreshToken;
 	
 	@Email
@@ -53,17 +53,17 @@ public class User {
 	private String email;
 
 	@Column(name = "telefono", length = 30, unique = true, nullable = false)
-	private String telefono;
+	private String phone;
 
 	@Column(name = "contrasena", nullable = false)
-	private String contrasena;
+	private String password;
 
 	@Column(name = "rol", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private UserRoles rol;
+	private UserRoles roles;
 
 	@Column(name = "activo", nullable = false)
-	private Boolean activo;
+	private Boolean active;
 
 	@Column(name = "createdAt", nullable = false, updatable = false)
 	private LocalDateTime createdAt;

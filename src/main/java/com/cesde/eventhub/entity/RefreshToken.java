@@ -29,16 +29,16 @@ public class RefreshToken {
 	private Long id;
 	
 	@OneToOne
-	@JoinColumn(name = "usuario_id", nullable = false)
-	private User usuario;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 	
 	@Column(name = "token", nullable = false, unique = true)
 	private String token;
 	
 	@Column(name = "fecha_expiracion", nullable = false)
-	private Instant fechaExpiracion;
+	private Instant expirationDate;
 	
-	public boolean estaExpirado() {
-		return Instant.now().isAfter(this.fechaExpiracion);
+	public boolean isExpired() {
+		return Instant.now().isAfter(this.expirationDate);
 	}
 }

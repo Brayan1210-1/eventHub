@@ -21,63 +21,63 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
 
-	private final UserRepository usuarioRepos;
+	private final UserRepository userRepository;
 
 
 	private final PasswordEncoder passwordEncoder;
 	
 
-	private final UserMapper usuarioMapper;
+	private final UserMapper userMapper;
 	
 	
 
 	@Transactional
-	public UserResponseDTO crearCliente(UserRegisterDTO usuarioDTO) {
+	public UserResponseDTO createClient(UserRegisterDTO userDTO) {
 
-		if(usuarioRepos.existsByEmail(usuarioDTO.getEmail()) || usuarioRepos.existsByDocumento(usuarioDTO.getDocumento())) {
+		if(userRepository.existsByEmail(userDTO.getEmail()) || userRepository.existsByDocument(userDTO.getDocument())) {
 		throw new RuntimeException ("Ya existe un usuario con ese email o documento");
 
 		}
 
-		User usuarioAGuardar = usuarioMapper.haciaEntidad(usuarioDTO);
+		User userToSave = userMapper.haciaEntidad(userDTO);
 		
-		usuarioAGuardar.setRol(UserRoles.CLIENTE);
-		usuarioAGuardar.setActivo(true);
+		userToSave.setRoles(UserRoles.CLIENTE);
+		userToSave.setActive(true);
 
 		//CIFRAR y asignar contraseña
-        String contraseña = usuarioDTO.getContrasena();
-        String contraseñaCifrada = passwordEncoder.encode(contraseña);
-        usuarioAGuardar.setContrasena(contraseñaCifrada);
+        String password = userDTO.getPassword();
+        String passwordEncrypted = passwordEncoder.encode(password);
+        userToSave.setPassword(passwordEncrypted);
 
-        User usuarioGuardado = usuarioRepos.save(usuarioAGuardar);
+        User userSave = userRepository.save(userToSave);
 
         //aún falta devolver el jwt
-		return usuarioMapper.haciaDto(usuarioGuardado);
+		return userMapper.haciaDto(userSave);
 	}
 
 	public UserResponseDTO iniciarSesion(LoginDTO login) {
 		
-		User usuarioEncontrado = findByEmail(login.getEmail());
+		User foundUser = findByEmail(login.getEmail());
 		
 		//mirar si la contraseña es correcta
-		if(!passwordEncoder.matches(login.getContrasena(), usuarioEncontrado.getContrasena())) {
+		if(!passwordEncoder.matches(login.getPassword(), foundUser.getPassword())) {
 			throw new SecurityException("La contraseña es incorrecta");
 		}
 		
-		UserResponseDTO usuarioRespuesta = usuarioMapper.haciaDto(usuarioEncontrado);
+		UserResponseDTO userResponse = userMapper.haciaDto(foundUser);
 		
-		return usuarioRespuesta;
+		return userResponse;
 	}
 
 	public User findByEmail(String email) {
 		
-		Optional<User> usuarioABuscar = usuarioRepos.findByEmail(email);
-		if(!usuarioABuscar.isPresent()) {
+		Optional<User> userToSearch = userRepository.findByEmail(email);
+		if(!userToSearch.isPresent()) {
 			throw new RuntimeException("No existe un usuario con ese email");
 		}
 		
-		User usuario = usuarioABuscar.get();
-		return usuario;
+		User user = userToSearch.get();
+		return user;
 	}
 
 }

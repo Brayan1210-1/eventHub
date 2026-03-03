@@ -16,7 +16,7 @@ import com.cesde.eventhub.entity.Place;
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Long>{
 
-	public Page<Place> findByActivoTrue(Pageable pageable);
+	public Page<Place> findByActiveTrue(Pageable pageable);
 	
 	public Optional<Place> findById(Long id);
 }

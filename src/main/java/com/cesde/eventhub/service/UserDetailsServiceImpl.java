@@ -18,28 +18,28 @@ import lombok.RequiredArgsConstructor;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 
-    private final UserRepository usuarioRepositorio;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
     	
-    	User usuario;
+    	User user;
     	
     	if (isUUID(identifier)) {
-            usuario = usuarioRepositorio.findById(UUID.fromString(identifier))
+            user = userRepository.findById(UUID.fromString(identifier))
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con ID: " + identifier));
         } else {
     	
-        usuario = usuarioRepositorio.findByEmail(identifier)
+        user = userRepository.findByEmail(identifier)
         		.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
       
      }
     	
     	
     	return org.springframework.security.core.userdetails.User
-                .withUsername(usuario.getId().toString())
-                .password(usuario.getContrasena())
-                .roles(usuario.getRol().name())
+                .withUsername(user.getId().toString())
+                .password(user.getPassword())
+                .roles(user.getRoles().name())
                 .build();
     }
     

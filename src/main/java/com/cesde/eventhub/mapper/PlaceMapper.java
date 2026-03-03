@@ -12,19 +12,19 @@ import com.cesde.eventhub.entity.Place;
 public interface PlaceMapper {
 
 	@Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-	Place haciaEntidad(PlaceDTO crearLugar);
+	Place toEntity(PlaceDTO crearLugar);
 	
-	PlaceDTO haciaDto(Place lugar);
+	PlaceDTO toDTO(Place lugar);
 	
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
-	Place haciaEntidadAct(UpdatePlaceDTO actualizarLugar);
+	Place toEntityUpdate(UpdatePlaceDTO actualizarLugar);
 	
-	UpdatePlaceDTO haciaDTOAct(Place lugar);
+	UpdatePlaceDTO toDTOUpdate(Place lugar);
 	
      //usar MappingTarget
 	
