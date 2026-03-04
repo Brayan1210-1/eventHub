@@ -12,6 +12,7 @@ import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.UserRoles;
+import com.cesde.eventhub.exception.custom.*;
 import com.cesde.eventhub.mapper.UserMapper;
 import com.cesde.eventhub.repository.RoleRepository;
 import com.cesde.eventhub.repository.UserRepository;
@@ -35,11 +36,8 @@ public class UserService {
 
 	@Transactional
 	public UserResponseDTO createClient(UserRegisterDTO userDTO) {
-
-		if(userRepository.existsByEmail(userDTO.getEmail()) || userRepository.existsByDocument(userDTO.getDocument())) {
-		throw new RuntimeException ("Ya existe un usuario con ese email o documento");
-
-		}
+		
+		validateData(userDTO);
 
 		User userToSave = userMapper.haciaEntidad(userDTO);
 		
@@ -56,7 +54,6 @@ public class UserService {
 
         User userSave = userRepository.save(userToSave);
 
-        //aún falta devolver el jwt
 		return userMapper.haciaDto(userSave);
 	}
 
@@ -66,7 +63,7 @@ public class UserService {
 		
 		//mirar si la contraseña es correcta
 		if(!passwordEncoder.matches(login.getPassword(), foundUser.getPassword())) {
-			throw new SecurityException("La contraseña es incorrecta");
+			throw new NotMatch("La contraseña es incorrecta");
 		}
 		
 		UserResponseDTO userResponse = userMapper.haciaDto(foundUser);
@@ -74,11 +71,27 @@ public class UserService {
 		return userResponse;
 	}
 
+	public void validateData(UserRegisterDTO userDTO) {
+		
+		if(userRepository.existsByDocument(userDTO.getDocument())) {
+			throw new InvalidUserRegistration("El usuario ya existe con ese documento");
+		}
+		
+		if(userRepository.existsByEmail(userDTO.getEmail())) {
+			throw new InvalidUserRegistration("El usuario ya existe con ese correo");
+		}
+		
+		if(userRepository.existsByPhone(userDTO.getPhone())) {
+			throw new InvalidUserRegistration("Ya existe un usuario con ese teléfono");
+		}
+		
+	}
+	
 	public User findByEmail(String email) {
 		
 		Optional<User> userToSearch = userRepository.findByEmail(email);
 		if(!userToSearch.isPresent()) {
-			throw new RuntimeException("No existe un usuario con ese email");
+			throw new DataNotFound("No existe un usuario con ese email");
 		}
 		
 		User user = userToSearch.get();
