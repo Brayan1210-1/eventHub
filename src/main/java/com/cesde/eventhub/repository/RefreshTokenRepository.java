@@ -13,7 +13,7 @@ import com.cesde.eventhub.entity.RefreshToken;
 import com.cesde.eventhub.entity.User;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
 	Optional<RefreshToken> findByToken(String token);
 	

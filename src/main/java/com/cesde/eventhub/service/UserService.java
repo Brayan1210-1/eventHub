@@ -13,9 +13,12 @@ import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.UserRoles;
 import com.cesde.eventhub.exception.custom.*;
+import com.cesde.eventhub.mapper.ClientMapper;
 import com.cesde.eventhub.mapper.UserMapper;
+import com.cesde.eventhub.repository.ClientRepository;
 import com.cesde.eventhub.repository.RoleRepository;
 import com.cesde.eventhub.repository.UserRepository;
+import com.cesde.eventhub.entity.Client;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,12 +28,16 @@ public class UserService {
 
 
 	private final UserRepository userRepository;
+	
+	private final ClientRepository clientRepository;
 
 	private final RoleRepository roleRepository;
 
 	private final PasswordEncoder passwordEncoder;
 	
 	private final UserMapper userMapper;
+	
+	private final ClientMapper clientMapper; 
 	
 	
 
@@ -53,6 +60,10 @@ public class UserService {
         userToSave.setPassword(passwordEncrypted);
 
         User userSave = userRepository.save(userToSave);
+        
+        Client client = clientMapper.toEntity(userDTO);
+        client.setUser(userSave);
+        clientRepository.save(client);
 
 		return userMapper.haciaDto(userSave);
 	}
@@ -73,7 +84,7 @@ public class UserService {
 
 	public void validateData(UserRegisterDTO userDTO) {
 		
-		if(userRepository.existsByDocument(userDTO.getDocument())) {
+		if(clientRepository.existsByDocument(userDTO.getDocument())) {
 			throw new InvalidUserRegistration("El usuario ya existe con ese documento");
 		}
 		
@@ -81,7 +92,7 @@ public class UserService {
 			throw new InvalidUserRegistration("El usuario ya existe con ese correo");
 		}
 		
-		if(userRepository.existsByPhone(userDTO.getPhone())) {
+		if(clientRepository.existsByPhone(userDTO.getPhone())) {
 			throw new InvalidUserRegistration("Ya existe un usuario con ese teléfono");
 		}
 		

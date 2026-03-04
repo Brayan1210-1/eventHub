@@ -38,40 +38,33 @@ public class User {
 	@UuidGenerator
 	private UUID id;
 
-	@Column(name = "name", nullable = false, length = 50)
-	private String name;
-
-	@Column(name = "lastName", nullable = false, length = 50)
-	private String lastName;
-
-	@Column(name = "document", nullable = false, length = 20, unique = true)
-	private String document;
-
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private RefreshToken refreshToken;
-	
 	@Email
 	@Column(name = "email", nullable = false, length = 50, unique = true)
 	private String email;
-
-	@Column(name = "phone", length = 30, unique = true)
-	private String phone;
-
+	
 	@Column(name = "password", nullable = false)
 	private String password;
 
+	
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(referencedColumnName = "id")
-    )
+         )
     private Set<Role> roles = new HashSet<>();
 	
 	
 	@Column(name = "activo", nullable = false)
 	private Boolean active;
-
+	
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private RefreshToken refreshToken;
+	
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Client client;
+	
+	
 	@Column(name = "created_At", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
