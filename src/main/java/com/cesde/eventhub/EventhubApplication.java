@@ -42,11 +42,8 @@ public class EventhubApplication {
 	        	if(userRepository.findByEmail(emailAdmin).isEmpty()) {
 	        		
 	            User admin = new User();
-	            admin.setName("PrimerAdmin");
-	            admin.setLastName("Quejada");
+	           
 	            admin.setEmail(emailAdmin);
-	            admin.setPhone("313672");
-	            admin.setDocument("1038384953");
 	            admin.setActive(true);
 	            admin.setPassword(passwordEncoder.encode("Admin123"));
 	            

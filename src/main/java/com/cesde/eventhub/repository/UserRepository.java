@@ -11,14 +11,9 @@ import com.cesde.eventhub.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID>{
 
-	public Optional<User> findByName(String name);
 
 	public Optional<User> findByEmail(String email);
 
 	public boolean existsByEmail(String email);
-
-	public boolean existsByDocument(String document);
-	
-	public boolean existsByPhone(String phone);
 
 }

@@ -4,22 +4,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+
+import org.mapstruct.ReportingPolicy;
 
 import com.cesde.eventhub.dto.request.UserRegisterDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+unmappedTargetPolicy = ReportingPolicy.IGNORE )
 public interface UserMapper {
 
-	@Mapping(target = "id", ignore = true)
-    @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "active", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-	@Mapping(target = "refreshToken", ignore = true)
+	
 	User haciaEntidad(UserRegisterDTO usuarioDTO);
 	
 	UserResponseDTO haciaDto(User usuario);
