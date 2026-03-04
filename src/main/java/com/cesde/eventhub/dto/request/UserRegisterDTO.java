@@ -13,23 +13,23 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserRegisterDTO {
 
-	@NotBlank
+	@NotBlank(message = "El nombre no puede ser nulo o en blanco")
 	private String name;
 
-	@NotBlank
+	@NotBlank(message = "El apellido es obligatorio")
 	private String lastName;
 
-	@Email
-	@NotBlank
+	@Email(message = "Debe ser un email válido")
+	@NotBlank(message = "El email es obligatorio")
 	private String email;
 
-	@NotBlank
+	@NotBlank(message = "Debe ingresar una contraseña")
 	private String password;
 
-	@NotBlank
+	@NotBlank(message = "El documento es obligatorio")
 	private String document;
 
-	@NotBlank
+	
 	private String phone;
 
 

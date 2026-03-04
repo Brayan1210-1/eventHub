@@ -36,24 +36,19 @@ public class AuthController {
 
 	@PostMapping("/registro")
 	public ResponseEntity<?> createUser(@Valid @RequestBody UserRegisterDTO user) {
-
-		try {
+		
 			UserResponseDTO userCreate = userService.createClient(user);
 
 			String token = jwtService.generateAccessToken(userCreate.getId(), userCreate.getEmail(),
 					userCreate.getRoles());
 
 			return ResponseEntity.status(HttpStatus.CREATED).body(token);
-		} catch (RuntimeException runtimeException) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body("Ya existe un usuario con ese email, documento o teléfono");
-		}
+
 	}
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody LoginDTO login) {
 
-		try {
 			UserResponseDTO user = userService.iniciarSesion(login);
 
 	    String accessToken = jwtService.generateAccessToken(
@@ -63,13 +58,8 @@ public class AuthController {
 
 			RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-			// Añadir clase para manejo de excepciones
 			return ResponseEntity.status(HttpStatus.OK)
 					.body(new ResponseLoginDTO(refreshToken.getToken(), accessToken));
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body("No existe un usuario con ese email o la contraseña es incorrecta");
-		}
 
 	}
 
