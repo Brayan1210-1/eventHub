@@ -111,4 +111,14 @@ public class ZoneService {
 	
 	return place;
 	}
+	
+	public Place validateActivePlace(Zone zone) {
+		Place place = placeService.validatePlaceExists(zone.getPlace().getId());
+		
+		if (!place.getActive()) {
+			throw new InvalidRegistration("No se puede crear o actualizar eventos en un lugar no activo");
+		}
+		
+		return place;
+	}
 }

@@ -59,7 +59,29 @@ public class EventhubApplication {
 	           
 	            userRepository.save(admin);
 	            System.out.println("El admin hace aparición");
+	            
 	        	}
+	        	
+	          	String emailOrganizador = "organizador@gmail.com";
+	          	
+	        	if(userRepository.findByEmail(emailOrganizador).isEmpty()) {
+	        		
+		            User organizador = new User();
+		           
+		            organizador.setEmail(emailOrganizador);
+		            organizador.setActive(true);
+		            organizador.setPassword(passwordEncoder.encode("Organizador123"));
+		            
+		            Optional<Role> roleOpt2 = roleRepository.findByNameRole(UserRoles.ORGANIZADOR);
+		            Role roleO = roleOpt2.get();
+		            
+		            organizador.getRoles().add(roleO);
+		           
+		            userRepository.save(organizador);
+		            System.out.println("El organizador hace aparición");
+		            
+		        	}
+	        	
 	        	
 	        };
 	 }

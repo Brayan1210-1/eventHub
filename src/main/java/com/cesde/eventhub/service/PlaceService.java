@@ -15,6 +15,7 @@ import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.mapper.PlaceMapper;
 import com.cesde.eventhub.repository.PlaceRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +32,7 @@ public class PlaceService {
 	}
 
 	@Secured("ROLE_ADMIN")
+	@Transactional
 	public PlaceDTO createPlace(PlaceDTO place) {
 		
 		//if(lugar.getCapacidad_total() == null || lugar.getCiudad() == null || lugar.getDireccion() == null
@@ -52,6 +54,7 @@ public class PlaceService {
 	}
 	
 	@Secured("ROLE_ADMIN")
+	@Transactional
 	public UpdatePlaceDTO updatePlace(Long id, UpdatePlaceDTO placeDTO) {
 		
 		

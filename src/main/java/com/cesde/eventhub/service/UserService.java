@@ -1,6 +1,5 @@
 package com.cesde.eventhub.service;
-import java.util.Optional;
-
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -101,13 +100,18 @@ public class UserService {
 	
 	public User findByEmail(String email) {
 		
-		Optional<User> userToSearch = userRepository.findByEmail(email);
-		if(!userToSearch.isPresent()) {
-			throw new DataNotFound("No existe un usuario con ese email");
-		}
+		User userToSearch = userRepository.findByEmail(email)
+				.orElseThrow(() -> new DataNotFound("No se encontró el usuario con ese email"));
 		
-		User user = userToSearch.get();
-		return user;
+		return userToSearch;
 	}
+	
+	public User findById(UUID id) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new DataNotFound("No existe un usuario con el id" ));
+			return user;
+	}
+
+	
 
 }
