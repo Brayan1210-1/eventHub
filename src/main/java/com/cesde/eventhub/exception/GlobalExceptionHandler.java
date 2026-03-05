@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.cesde.eventhub.exception.custom.DataNotFound;
-import com.cesde.eventhub.exception.custom.InvalidUserRegistration;
+import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.exception.custom.NotMatch;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler(exception = InvalidUserRegistration.class)
-	public ResponseEntity<ErrorResponse> invalidUserRegistrer(InvalidUserRegistration ex){
+	@ExceptionHandler(exception = InvalidRegistration.class)
+	public ResponseEntity<ErrorResponse> invalidUserRegistrer(InvalidRegistration ex){
 		ErrorResponse error = new ErrorResponse(
 				HttpStatus.BAD_REQUEST.value(),
 				ex.getMessage(),
@@ -45,7 +45,15 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.UNAUTHORIZED);
 	}
 	
-	
+	@ExceptionHandler(exception = InternalError.class)
+	public ResponseEntity<ErrorResponse> internalError(InternalError ex){
+		ErrorResponse error = new ErrorResponse(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				ex.getMessage(),
+				LocalDateTime.now()
+				);
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 	
 	

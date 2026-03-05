@@ -13,6 +13,7 @@ import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.UserRoles;
 import com.cesde.eventhub.exception.custom.*;
+import com.cesde.eventhub.exception.custom.InternalError;
 import com.cesde.eventhub.mapper.ClientMapper;
 import com.cesde.eventhub.mapper.UserMapper;
 import com.cesde.eventhub.repository.ClientRepository;
@@ -49,7 +50,7 @@ public class UserService {
 		User userToSave = userMapper.haciaEntidad(userDTO);
 		
 		Role clientRole = roleRepository.findByNameRole(UserRoles.CLIENTE)
-                .orElseThrow(() -> new RuntimeException("Error: El rol CLIENTE no está configurado en la base de datos."));
+                .orElseThrow(() -> new InternalError("Error: El rol CLIENTE no está configurado en la base de datos."));
 		
 		userToSave.getRoles().add(clientRole);
 		userToSave.setActive(true);
@@ -85,15 +86,15 @@ public class UserService {
 	public void validateData(UserRegisterDTO userDTO) {
 		
 		if(clientRepository.existsByDocument(userDTO.getDocument())) {
-			throw new InvalidUserRegistration("El usuario ya existe con ese documento");
+			throw new InvalidRegistration("El usuario ya existe con ese documento");
 		}
 		
 		if(userRepository.existsByEmail(userDTO.getEmail())) {
-			throw new InvalidUserRegistration("El usuario ya existe con ese correo");
+			throw new InvalidRegistration("El usuario ya existe con ese correo");
 		}
 		
 		if(clientRepository.existsByPhone(userDTO.getPhone())) {
-			throw new InvalidUserRegistration("Ya existe un usuario con ese teléfono");
+			throw new InvalidRegistration("Ya existe un usuario con ese teléfono");
 		}
 		
 	}

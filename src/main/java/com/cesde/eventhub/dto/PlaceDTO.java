@@ -1,5 +1,6 @@
 package com.cesde.eventhub.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,7 +24,8 @@ public class PlaceDTO {
 	private String city;
 	
 	@NotNull(message = "La capacidad no puede ser nula")
-	private Integer total_capacity;
+	@Min(value = 1, message = "La capacidad total no puede ser menor a 1")
+	private Integer totalCapacity;
 	
 	private String description;
 	

@@ -1,5 +1,6 @@
 package com.cesde.eventhub.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -10,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "clientes")
+@Table(name = "clients")
 public class Client {
 
     @Id
@@ -44,6 +47,22 @@ public class Client {
 
     @Column(name = "telefono", length = 30, unique = true)
     private String phone;
+    
+    @Column(name = "created_At", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-   
+	@Column(name = "updated_At", nullable = false)
+	private LocalDateTime updatedAt;
+
+	@PrePersist
+	  protected void onCreate() {
+	    this.createdAt = LocalDateTime.now();
+	    this.updatedAt = LocalDateTime.now();
+	  }
+
+	@PreUpdate
+	  protected void onUpdate() {
+	    this.updatedAt = LocalDateTime.now();
+	  }
+
 }
