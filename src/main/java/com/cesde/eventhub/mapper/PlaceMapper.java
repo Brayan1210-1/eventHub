@@ -3,12 +3,17 @@ package com.cesde.eventhub.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
+import com.cesde.eventhub.dto.request.ZoneRegisterDTO;
+import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
+import com.cesde.eventhub.entity.Zone;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PlaceMapper {
 
 	@Mapping(target = "id", ignore = true)
@@ -22,10 +27,18 @@ public interface PlaceMapper {
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "createdAt", ignore = true)
 	@Mapping(target = "updatedAt", ignore = true)
-	Place toEntityUpdate(UpdatePlaceDTO actualizarLugar);
+	Place toEntityUpdate(UpdatePlaceDTO updatePlace);
 	
-	UpdatePlaceDTO toDTOUpdate(Place lugar);
+	 //use MappingTarget
+	UpdatePlaceDTO toDTOUpdate(Place place);
 	
-     //usar MappingTarget
+	@Mapping(target = "id", ignore = true) 
+    
+    void updateEntityFromDTO(UpdatePlaceDTO dto, @MappingTarget Place place);
+	
+	PlaceResponseDTO toPage(Place place);
+	
+	
+    
 	
 }

@@ -9,6 +9,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
@@ -35,6 +37,14 @@ public class SwaggerConfig {
 	          .url("http://localhost:8081")
 	          .description("Servidor local")
 	        )
-	      );
+	      )
+	      
+	      .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+          .components(new io.swagger.v3.oas.models.Components()
+              .addSecuritySchemes("BearerAuth", new SecurityScheme()
+                  .name("BearerAuth")
+                  .type(SecurityScheme.Type.HTTP)
+                  .scheme("bearer")
+                  .bearerFormat("JWT")));
 	  }
 }

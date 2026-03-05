@@ -1,5 +1,5 @@
 package com.cesde.eventhub.service;
-import java.util.Optional;
+
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
+import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
+import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.mapper.PlaceMapper;
 import com.cesde.eventhub.repository.PlaceRepository;
 
@@ -19,9 +21,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PlaceService {
 	
-	private final PlaceMapper mapper;
+	private final PlaceMapper placeMapper;
 	
 	private final PlaceRepository placeRepository;
+	
+	public Place validatePlaceExists(Long id) {
+		return placeRepository.findById(id)
+	            .orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
+	}
 
 	@Secured("ROLE_ADMIN")
 	public PlaceDTO createPlace(PlaceDTO place) {
@@ -31,55 +38,41 @@ public class PlaceService {
 			//throw new RuntimeException("Los campos capacidad, ciudad, direccion y nombre no pueden ser nulos");
 		//}
 		
-		Place placeToSave = mapper.toEntity(place);
+		Place placeToSave = placeMapper.toEntity(place);
 		placeToSave.setActive(true);
 		Place placeSaved = placeRepository.save(placeToSave);
 		
-		return mapper.toDTO(placeSaved);
+		return placeMapper.toDTO(placeSaved);
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public Page<Place> activesPlaces(Pageable pageable){
-	
-		return placeRepository.findByActiveTrue(pageable);
+	public Page<PlaceResponseDTO> activesPlaces(Pageable pageable) {
+	    return placeRepository.findByActiveTrue(pageable)
+	            .map(placeMapper::toPage); 
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public UpdatePlaceDTO updatePlace(Long id, UpdatePlaceDTO place) {
+	public UpdatePlaceDTO updatePlace(Long id, UpdatePlaceDTO placeDTO) {
 		
-		Optional<Place> optionalPlace = placeRepository.findById(id);
-		
-		if(!optionalPlace.isPresent()) {
-			throw new RuntimeException("No existe un lugar con el id: " + id);
-		}
 		
 		//USAR MAPSTRUCT
-		Place foundPlace = optionalPlace.get();
+		Place foundPlace = validatePlaceExists(id);
 		
-		foundPlace.setName(place.getName());
-		foundPlace.setCity(place.getCity());
-		foundPlace.setTotal_capacity(place.getTotal_capacity());
-		foundPlace.setDescription(place.getDescription());
-		foundPlace.setAddress(place.getAddress());
-		foundPlace.setActive(place.getActive());
-		foundPlace.setImageUrl(place.getImageUrl());
+		placeMapper.updateEntityFromDTO(placeDTO, foundPlace);
 		
 		placeRepository.save(foundPlace);
 		
-		return mapper.toDTOUpdate(foundPlace);
+		return placeMapper.toDTOUpdate(foundPlace);
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public void deletePlace(Long id) {
 		
-		Optional<Place> optionalPlace = placeRepository.findById(id);
-		if(optionalPlace.isEmpty()) {
-			throw new RuntimeException("No se pudo encontrar el lugar con id: "+ id);
-		}
-		
-		Place deletedPlace = optionalPlace.get();	
+		Place deletedPlace = validatePlaceExists(id);
 		placeRepository.delete(deletedPlace);
+		
 	}
+	
 	
 	
 }
