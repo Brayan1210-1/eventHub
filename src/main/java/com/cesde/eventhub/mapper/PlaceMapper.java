@@ -7,10 +7,9 @@ import org.mapstruct.ReportingPolicy;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
-import com.cesde.eventhub.dto.request.ZoneRegisterDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
-import com.cesde.eventhub.entity.Zone;
+
 
 @Mapper(componentModel = "spring",
 unmappedTargetPolicy = ReportingPolicy.IGNORE)
