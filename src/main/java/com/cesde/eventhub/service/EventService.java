@@ -14,6 +14,7 @@ import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.entity.Zone;
 import com.cesde.eventhub.enums.EventStatus;
+import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.EventMapper;
 import com.cesde.eventhub.repository.EventRepository;
@@ -30,6 +31,16 @@ public class EventService {
     private final EventMapper eventMapper;
     private final UserService userService;
     
+    
+    public Event validateEventExists(Long id) {
+    	
+    	   Event event = eventRepository.findById(id)
+    			   .orElseThrow(() -> new DataNotFound("No existe un evento con ese id"));
+    	   
+    	   return event;
+    }
+    
+    
 
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public List<EventResponseDTO> getAllEvents() {
@@ -37,6 +48,7 @@ public class EventService {
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    
     
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")

@@ -1,6 +1,7 @@
 package com.cesde.eventhub.service;
 import java.util.UUID;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,22 @@ public class UserService {
 		return userResponse;
 	}
 
+
+		public void validateAuthority(UUID ownerId) {
+		   
+		    String currentUserIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+		    
+		    UUID currentUserId = UUID.fromString(currentUserIdStr);
+		    
+		   boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+	                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+		    if (!isAdmin && !currentUserId.equals(ownerId)) {
+		        throw new Unauthorized("No tienes permiso para gestionar este evento.");
+		    }
+		
+	}
+	
 	public void validateData(UserRegisterDTO userDTO) {
 		
 		if(clientRepository.existsByDocument(userDTO.getDocument())) {
