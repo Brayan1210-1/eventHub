@@ -3,10 +3,12 @@ package com.cesde.eventhub.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import com.cesde.eventhub.enums.Category;
 import com.cesde.eventhub.enums.EventStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +28,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "events")
-@Getter @Setter
+@Getter 
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
@@ -63,13 +67,16 @@ public class Event {
     private LocalDateTime salesEndDate;
 
     @Enumerated(EnumType.STRING)
-    private EventStatus status = EventStatus.BORRADOR;
+    private EventStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id", nullable = false)
-    private Zone zone;
+    @JoinColumn(name = "place_id", nullable = false)
+    private Place place;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
     private User organizer;
+    
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<TicketPrice> ticketPrices;
 }

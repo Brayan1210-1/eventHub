@@ -15,5 +15,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
 	List<Event> findAllByCategory(Category category);
 	
-	boolean existsByZoneIdAndEventDateAndStatusNot(Long zoneId, LocalDate eventDate, EventStatus status);
+	boolean existsByPlaceIdAndEventDateAndStatusNot(Long placeId, LocalDate eventDate, EventStatus status);
 }

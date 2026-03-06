@@ -31,7 +31,7 @@ public class ZoneService {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ZoneResponseDTO createZone(ZoneRegisterDTO zone) {
 		
-		Place place = validateActivePlace(zone);
+		Place place = placeService.validatePlaceIsActiveAndExists(zone.getPlaceId());
 		
 		validateCapacity(place, zone.getCapacity(), 0);
 		
@@ -48,11 +48,12 @@ public class ZoneService {
 	public ZoneResponseDTO updateZone(Long id, ZoneRegisterDTO updateZone) {
 		
 		Zone zoneFound = findById(id);
-		Place place = validateActivePlace(updateZone);
+		Place place = placeService.validatePlaceIsActiveAndExists(updateZone.getPlaceId());
 		
 		validateCapacity(place, updateZone.getCapacity(), zoneFound.getCapacity());
 		
 		zoneMapper.updateEntityFromDTO(updateZone, zoneFound);
+		zoneFound.setPlace(place);
 		
 		Zone savedZone = zoneRepository.save(zoneFound);
 		
@@ -84,7 +85,6 @@ public class ZoneService {
 	
 	public void validateCapacity(Place place, int newCapacity, int currentZoneCapacity) {
 		
-		
 		Integer sumCapacityZones = zoneRepository.sumCapacityByPlaceId(place.getId());
 		
 		int totalCapacityZones = (sumCapacityZones != null ? sumCapacityZones : 0);
@@ -102,23 +102,5 @@ public class ZoneService {
 		
 	}
 	
-	public Place validateActivePlace(ZoneRegisterDTO zone) {
-	Place place = placeService.validatePlaceExists(zone.getPlaceId());
 	
-	if (!place.getActive()) {
-		throw new InvalidRegistration("No se puede crear o actualizar eventos en un lugar no activo");
-	}
-	
-	return place;
-	}
-	
-	public Place validateActivePlace(Zone zone) {
-		Place place = placeService.validatePlaceExists(zone.getPlace().getId());
-		
-		if (!place.getActive()) {
-			throw new InvalidRegistration("No se puede crear o actualizar eventos en un lugar no activo");
-		}
-		
-		return place;
-	}
 }

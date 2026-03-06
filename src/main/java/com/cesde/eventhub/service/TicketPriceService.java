@@ -25,6 +25,7 @@ public class TicketPriceService {
 
 	private final ZoneService zoneService;
 	private final EventService eventService;
+	private final PlaceService placeService;
 	private final UserService userService;
 	private final TicketPriceMapper ticketMapper;
 	private final TicketPriceRepository ticketPriceRepository;
@@ -42,16 +43,16 @@ public class TicketPriceService {
 	    
 	    Zone zone = zoneService.findById(ticket.getZoneId());
 	    
-	    zoneService.validateActivePlace(zone); 
+	    placeService.validatePlaceIsActiveAndExists(zone.getPlace().getId()); 
 	    
 	   validateAvaliableQuantity(ticket, zone);
 
-	    // 2. Uso del Mapper
+	    
 	    TicketPrice ticketPrice = ticketMapper.toEntity(ticket);
 	    ticketPrice.setEvent(event);
 	    ticketPrice.setZone(zone);
 
-	    // 3. Guardar y devolver mapeado
+	  
 	    TicketPrice savedPrice = ticketPriceRepository.save(ticketPrice);
 	    return ticketMapper.toDTO(savedPrice);
 	}
