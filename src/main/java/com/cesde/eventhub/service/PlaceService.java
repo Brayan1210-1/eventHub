@@ -12,6 +12,7 @@ import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
 import com.cesde.eventhub.exception.custom.DataNotFound;
+import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.PlaceMapper;
 import com.cesde.eventhub.repository.PlaceRepository;
 
@@ -26,11 +27,6 @@ public class PlaceService {
 	
 	private final PlaceRepository placeRepository;
 	
-	public Place validatePlaceExists(Long id) {
-		return placeRepository.findById(id)
-	            .orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
-	}
-
 	@Secured("ROLE_ADMIN")
 	@Transactional
 	public PlaceDTO createPlace(PlaceDTO place) {
@@ -74,6 +70,32 @@ public class PlaceService {
 		Place deletedPlace = validatePlaceExists(id);
 		placeRepository.delete(deletedPlace);
 		
+	}
+	
+	public Place validatePlaceExists(Long id) {
+		return placeRepository.findById(id)
+	            .orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
+	}
+	
+	public Place validatePlaceIsActiveAndExists(Long id) {
+	    Place place = validatePlaceExists(id);
+	    if (!place.getActive()) {
+	        throw new InvalidRegistration("El lugar '" + place.getName() + "' no está activo.");
+	    }
+	    return place;
+	}
+
+	
+	public Place findPlaceById(Long id) {
+		 Place place = placeRepository.findById(id)
+				.orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
+		 return place;
+	}
+	
+	public void placeIsActive(Place place) {
+		if(!place.getActive()) {
+			throw new InvalidRegistration("No se puede crear un evento en un lugar inactivo");
+		}
 	}
 	
 	

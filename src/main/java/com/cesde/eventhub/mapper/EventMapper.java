@@ -15,8 +15,8 @@ public interface EventMapper {
    
     Event toEntity(EventRegisterDTO dto);
 
-    @Mapping(source = "zone.name", target = "zoneName")
-    @Mapping(source = "zone.place.name", target = "placeName")
+    @Mapping(source = "place.id", target = "placeId")
+    @Mapping(source = "place.name", target = "placeName")
     @Mapping(source = "organizer.email", target = "organizerEmail")
     EventResponseDTO toDTO(Event entity);
 }

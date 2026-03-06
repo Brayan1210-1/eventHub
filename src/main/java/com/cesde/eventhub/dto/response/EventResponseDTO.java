@@ -31,5 +31,6 @@ public class EventResponseDTO {
    
     private String zoneName;
     private String placeName;
+    private Long placeId;
     private String organizerEmail;
 }

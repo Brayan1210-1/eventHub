@@ -39,6 +39,6 @@ public class EventRegisterDTO {
     private LocalDateTime salesStartDate;
     private LocalDateTime salesEndDate;
 
-    @NotNull(message = "Zone ID is required")
-    private Long zoneId;
+    @NotNull(message = "Place ID is required")
+    private Long placeId;
 }
