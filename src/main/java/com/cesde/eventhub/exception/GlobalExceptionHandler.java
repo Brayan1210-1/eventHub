@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.exception.custom.NotMatch;
+import com.cesde.eventhub.exception.custom.Unauthorized;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -55,6 +56,15 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@ExceptionHandler(exception = Unauthorized.class)
+	public ResponseEntity<ErrorResponse> unauthorizedError(Unauthorized ex){
+		ErrorResponse error = new ErrorResponse(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				ex.getMessage(),
+				LocalDateTime.now()
+				);
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.UNAUTHORIZED);
+	}
 	
 	
 	

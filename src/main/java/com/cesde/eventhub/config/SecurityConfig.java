@@ -48,6 +48,7 @@ public class SecurityConfig {
 	                .requestMatchers( "/api/v1/admin/**").hasRole("ADMIN")
 	                .requestMatchers("/api/v1/zonas/**").hasRole("ADMIN")
 	                .requestMatchers("/api/v1/eventos/**").hasAnyRole("ADMIN", "ORGANIZADOR")
+	                .requestMatchers("/api/v1/tickets-precios/**").hasAnyRole("ADMIN", "ORGANIZADOR")
 	                .requestMatchers(
 	                        "/swagger/**",
 	                        "/swagger-ui/**",
