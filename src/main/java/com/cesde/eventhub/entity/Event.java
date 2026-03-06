@@ -68,6 +68,12 @@ public class Event {
 
     @Enumerated(EnumType.STRING)
     private EventStatus status;
+    
+    @Column(name = "cancellation_reason", length = 500)
+    private String cancellationReason;
+
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    private List<Order> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)

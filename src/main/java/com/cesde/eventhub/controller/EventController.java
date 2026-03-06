@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.service.EventService;
@@ -28,21 +29,30 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/crear")
-    @Operation(summary = "Create a new event", description = "Registers a new event in a specific zone. Only for ADMIN or ORGANIZADOR.")
     public ResponseEntity<EventResponseDTO> createEvent(@Valid @RequestBody EventRegisterDTO dto) {
         EventResponseDTO response = eventService.createEvent(dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
-    @PatchMapping("/{eventId}/publicar")
+    @PatchMapping("/publicar/{eventId}")
     public ResponseEntity<String> publishEvent(@PathVariable Long eventId) {
         eventService.publishEvent(eventId);
         return ResponseEntity.ok("El evento ha sido publicado exitosamente.");
     }
     
     @GetMapping("/todos")
-    @Operation(summary = "Get all events", description = "Retrieves a list of all registered events.")
     public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
         return ResponseEntity.ok(eventService.getAllEvents());
+    }
+    
+    @PatchMapping("/cancelar/{eventId}")
+    public ResponseEntity<String> cancelEvent(
+            @PathVariable Long eventId, 
+            @Valid @RequestBody EventCancelDTO dto) {
+        
+        eventService.cancelEvent(eventId, dto);
+        
+        return ResponseEntity.ok("El evento ha sido cancelado exitosamente " +
+                "Las órdenes pagadas han sido marcadas para reembolso y las boletas anuladas");
     }
 }
