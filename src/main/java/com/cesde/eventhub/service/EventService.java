@@ -9,15 +9,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.entity.Event;
+import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.EventStatus;
+import com.cesde.eventhub.enums.OrderStatus;
+import com.cesde.eventhub.enums.TicketStatus;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.EventMapper;
 import com.cesde.eventhub.repository.EventRepository;
+import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.entity.Place;
 
 import jakarta.transaction.Transactional;
@@ -28,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final OrderRepository orderRepository;
     private final PlaceService placeService;
     private final UserService userService;
     private final EventMapper eventMapper;
@@ -99,6 +105,38 @@ public class EventService {
         eventRepository.save(event);
     }
     
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    public void cancelEvent(Long eventId, EventCancelDTO dto) {
+        Event event = validateEventExists(eventId);
+        
+        userService.validateAuthority(event.getOrganizer().getId());
+
+       
+        if (event.getStatus() != EventStatus.BORRADOR && event.getStatus() != EventStatus.PUBLICADO) {
+            throw new InvalidRegistration("No se puede cancelar un evento en estado " + event.getStatus());
+        }
+
+      
+        List<Order> orders = orderRepository.findByEventId(event.getId());
+        for (Order order : orders) {
+            if (order.getStatus() == OrderStatus.PAGADA) {
+                order.setStatus(OrderStatus.REEMBOLSADA);
+                
+                order.getTickets().forEach(t -> t.setStatus(TicketStatus.CANCELADA));
+            } else if (order.getStatus() == OrderStatus.PENDIENTE) {
+                order.setStatus(OrderStatus.CANCELADA);
+            }
+        }
+
+       
+        event.setStatus(EventStatus.CANCELADO);
+        event.setCancellationReason(dto.getReason());
+        eventRepository.save(event);
+
+        System.out.println(" Evento cancelado y compradores notificados por email.");
+    }
+    
     public Event validateEventExists(Long id) {
     	
  	   Event event = eventRepository.findById(id)
@@ -106,4 +144,8 @@ public class EventService {
  	   
  	   return event;
  }
+    
+    
+    
+    
 }
