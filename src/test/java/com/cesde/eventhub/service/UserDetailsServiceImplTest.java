@@ -43,7 +43,7 @@ class UserDetailsServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // Configuramos el Rol y el Usuario para Spring Security
+      
         Role role = new Role();
         role.setNameRole(UserRoles.CLIENTE);
 
