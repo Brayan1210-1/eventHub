@@ -51,7 +51,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDIENTE;
 
-    private BigDecimal total; 
+    private double total; 
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod; 

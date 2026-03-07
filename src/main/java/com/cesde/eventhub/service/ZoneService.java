@@ -63,7 +63,7 @@ public class ZoneService {
 	@PreAuthorize("hasRole('ADMIN')")
 	public Page<ZoneResponseDTO> getZonesByPlace(Long placeId, Pageable pageable) {
 	  
-	    placeService.validatePlaceExists(placeId);
+	    placeService.findByPlaceId(placeId);
 	    
 	    return zoneRepository.findByPlaceId(placeId, pageable)
 	            .map(zoneMapper::toDTO);

@@ -31,10 +31,7 @@ public class PlaceService {
 	@Transactional
 	public PlaceDTO createPlace(PlaceDTO place) {
 		
-		//if(lugar.getCapacidad_total() == null || lugar.getCiudad() == null || lugar.getDireccion() == null
-			//	|| lugar.getNombre() == null) {
-			//throw new RuntimeException("Los campos capacidad, ciudad, direccion y nombre no pueden ser nulos");
-		//}
+		
 		
 		Place placeToSave = placeMapper.toEntity(place);
 		placeToSave.setActive(true);
@@ -55,7 +52,7 @@ public class PlaceService {
 		
 		
 		//USAR MAPSTRUCT
-		Place foundPlace = validatePlaceExists(id);
+		Place foundPlace = findByPlaceId(id);
 		
 		placeMapper.updateEntityFromDTO(placeDTO, foundPlace);
 		
@@ -67,18 +64,18 @@ public class PlaceService {
 	@Secured("ROLE_ADMIN")
 	public void deletePlace(Long id) {
 		
-		Place deletedPlace = validatePlaceExists(id);
+		Place deletedPlace = findByPlaceId(id);
 		placeRepository.delete(deletedPlace);
 		
 	}
 	
-	public Place validatePlaceExists(Long id) {
+	public Place findByPlaceId(Long id) {
 		return placeRepository.findById(id)
 	            .orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
 	}
 	
 	public Place validatePlaceIsActiveAndExists(Long id) {
-	    Place place = validatePlaceExists(id);
+	    Place place = findByPlaceId(id);
 	    if (!place.getActive()) {
 	        throw new InvalidRegistration("El lugar '" + place.getName() + "' no está activo.");
 	    }
@@ -86,17 +83,7 @@ public class PlaceService {
 	}
 
 	
-	public Place findPlaceById(Long id) {
-		 Place place = placeRepository.findById(id)
-				.orElseThrow(() -> new DataNotFound("No existe un lugar con ese id: " + id));
-		 return place;
-	}
 	
-	public void placeIsActive(Place place) {
-		if(!place.getActive()) {
-			throw new InvalidRegistration("No se puede crear un evento en un lugar inactivo");
-		}
-	}
 	
 	
 	

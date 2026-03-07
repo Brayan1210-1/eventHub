@@ -35,7 +35,7 @@ public class TicketPriceService {
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
 	public TicketPriceResponseDTO createTicketPrice(TicketPriceRegisterDTO ticket) {
 	  
-	    Event event = eventService.validateEventExists(ticket.getEventId());
+	    Event event = eventService.findEventById(ticket.getEventId());
 	    
 	    UUID onwerEventId = event.getOrganizer().getId();
 	    
@@ -60,7 +60,7 @@ public class TicketPriceService {
 	 @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
 	public List<TicketPriceResponseDTO> getPricesByEvent(Long eventId) {
 	  
-	    eventService.validateEventExists(eventId);
+	    eventService.findEventById(eventId);
 	    
 	    
 	    return ticketPriceRepository.findAllByEventId(eventId)

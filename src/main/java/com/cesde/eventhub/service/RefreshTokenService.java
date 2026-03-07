@@ -34,7 +34,7 @@ public class RefreshTokenService {
 	        	
 	        	User userEntity = userService.findByEmail(user.getEmail());
 
-	            // Generar refresh token con JwtServicio
+	            // Generate refresh token with JwtService
 	            String refreshTokenJwt = jwtService.generateRefreshToken(user.getId());
 
 	            RefreshToken refreshToken = new RefreshToken();
@@ -51,13 +51,13 @@ public class RefreshTokenService {
 	        private RefreshToken rotateRefreshToken(RefreshToken currentToken) {
 
 		        User user = currentToken.getUser();
-		        UserResponseDTO userToken = userMapper.haciaDto(user);	 
+		        UserResponseDTO userToken = userMapper.toDTO(user);	 
 
 		        refreshTokenRepository.deleteByUsuario(currentToken.getUser());
 		        
-		        RefreshToken nuevoRefreshToken = createRefreshToken(userToken);
+		        RefreshToken newRefreshToken = createRefreshToken(userToken);
 
-		        return nuevoRefreshToken;
+		        return newRefreshToken;
 		    }
 	        
 	        private RefreshToken validateRefreshToken(String refreshToken) {
@@ -81,11 +81,11 @@ public class RefreshTokenService {
 
 	        User user = validToken.getUser();
 	        
-	        UserResponseDTO userDTO = userMapper.haciaDto(user);
+	        UserResponseDTO userDTO = userMapper.toDTO(user);
 	        
 	        RefreshToken newRefresh = rotateRefreshToken(validToken);
 	      
-	        //CAMBIAR AUTH CONTROLADOR
+	        
 	String newAccess = jwtService.generateAccessToken(
 	        						userDTO.getId(),
 	                				userDTO.getEmail(),
