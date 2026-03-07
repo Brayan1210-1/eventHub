@@ -72,14 +72,14 @@ class TicketPriceServiceTest {
         zone.setCapacity(100);
         zone.setPlace(place);
 
-        // 2. DTO de registro
+   
         registerDTO = new TicketPriceRegisterDTO();
         registerDTO.setEventId(1L);
         registerDTO.setZoneId(20L);
         registerDTO.setAvailableQuantity(50); // Menor que la capacidad (100)
         registerDTO.setPrice(150.0);
 
-        // 3. Entidad resultado
+       
         ticketPriceEntity = new TicketPrice();
         ticketPriceEntity.setId(100L);
         ticketPriceEntity.setAvailableQuantity(50);
