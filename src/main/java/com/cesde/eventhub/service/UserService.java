@@ -47,15 +47,15 @@ public class UserService {
 		
 		validateData(userDTO);
 
-		User userToSave = userMapper.haciaEntidad(userDTO);
+		User userToSave = userMapper.toEntity(userDTO);
 		
 		Role clientRole = roleRepository.findByNameRole(UserRoles.CLIENTE)
-                .orElseThrow(() -> new InternalError("Error: El rol CLIENTE no está configurado en la base de datos."));
+                .orElseThrow(() -> new InternalError("El rol CLIENTE no está configurado en la base de datos."));
 		
 		userToSave.getRoles().add(clientRole);
 		userToSave.setActive(true);
 
-		//CIFRAR y asignar contraseña
+		
         String password = userDTO.getPassword();
         String passwordEncrypted = passwordEncoder.encode(password);
         userToSave.setPassword(passwordEncrypted);
@@ -66,19 +66,18 @@ public class UserService {
         client.setUser(userSave);
         clientRepository.save(client);
 
-		return userMapper.haciaDto(userSave);
+		return userMapper.toDTO(userSave);
 	}
 
 	public UserResponseDTO iniciarSesion(LoginDTO login) {
 		
 		User foundUser = findByEmail(login.getEmail());
 		
-		//mirar si la contraseña es correcta
 		if(!passwordEncoder.matches(login.getPassword(), foundUser.getPassword())) {
 			throw new NotMatch("La contraseña es incorrecta");
 		}
 		
-		UserResponseDTO userResponse = userMapper.haciaDto(foundUser);
+		UserResponseDTO userResponse = userMapper.toDTO(foundUser);
 		
 		return userResponse;
 	}

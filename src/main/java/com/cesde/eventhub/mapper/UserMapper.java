@@ -17,9 +17,9 @@ unmappedTargetPolicy = ReportingPolicy.IGNORE )
 public interface UserMapper {
 
 	
-	User haciaEntidad(UserRegisterDTO usuarioDTO);
+	User toEntity(UserRegisterDTO usuarioDTO);
 	
-	UserResponseDTO haciaDto(User usuario);
+	UserResponseDTO toDTO(User usuario);
 	
 	default Set<String> mapRoles(Set<Role> roles) {
         if (roles == null) {

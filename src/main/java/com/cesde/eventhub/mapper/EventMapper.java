@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
+import com.cesde.eventhub.dto.response.EventPublicDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.entity.Event;
 
@@ -19,4 +20,10 @@ public interface EventMapper {
     @Mapping(source = "place.name", target = "placeName")
     @Mapping(source = "organizer.email", target = "organizerEmail")
     EventResponseDTO toDTO(Event entity);
+    
+    /** US-010
+    @Mapping(source = "place.name", target = "placeName")
+    @Mapping(source = "place.city", target = "city")
+    EventPublicDTO toPublicDTO(Event event);
+    **/
 }

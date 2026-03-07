@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cesde.eventhub.entity.User;
+import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +21,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String identifier) throws DataNotFound {
     	
     	User user;
     	
     	if (isUUID(identifier)) {
             user = userRepository.findById(UUID.fromString(identifier))
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con ID: " + identifier));
+                .orElseThrow(() -> new DataNotFound("Usuario no encontrado con ID: " + identifier));
         } else {
     	
         user = userRepository.findByEmail(identifier)
-        		.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        		.orElseThrow(() -> new DataNotFound("Usuario no encontrado"));
       
      }
     	

@@ -52,9 +52,9 @@ public class EventService {
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public EventResponseDTO createEvent(EventRegisterDTO dto) {
         
-        Place place = placeService.findPlaceById(dto.getPlaceId());
+        Place place = placeService.validatePlaceIsActiveAndExists(dto.getPlaceId());
         
-          placeService.placeIsActive(place);
+         
        
         boolean isOccupied = eventRepository.existsByPlaceIdAndEventDateAndStatusNot(
             place.getId(), 
@@ -64,9 +64,9 @@ public class EventService {
      
          String organizerIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
           UUID organizerId = UUID.fromString(organizerIdStr);
-          
+         
           User organizer = userService.findById(organizerId);
-
+          
         if (isOccupied) {
             throw new InvalidRegistration("La zona " + place.getName() + " ya tiene un evento para esa fecha.");
         }
@@ -83,7 +83,7 @@ public class EventService {
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public void publishEvent(Long eventId) {
       
-        Event event = validateEventExists(eventId);
+        Event event = findEventById(eventId);
        
         userService.validateAuthority(event.getOrganizer().getId());
 
@@ -108,7 +108,7 @@ public class EventService {
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public void cancelEvent(Long eventId, EventCancelDTO dto) {
-        Event event = validateEventExists(eventId);
+        Event event = findEventById(eventId);
         
         userService.validateAuthority(event.getOrganizer().getId());
 
@@ -137,7 +137,7 @@ public class EventService {
         System.out.println(" Evento cancelado y compradores notificados por email.");
     }
     
-    public Event validateEventExists(Long id) {
+    public Event findEventById(Long id) {
     	
  	   Event event = eventRepository.findById(id)
  			   .orElseThrow(() -> new DataNotFound("No existe un evento con ese id"));
