@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.cesde.eventhub.entity.Event;
@@ -17,6 +17,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	List<Event> findAllByCategory(Category category);
 	
 	boolean existsByPlaceIdAndEventDateAndStatusNot(Long placeId, LocalDate eventDate, EventStatus status);
-
+	
+	@Query("SELECT e FROM Event e JOIN FETCH e.place p WHERE p.active = true")
+	List<Event> findAllWithActivePlace();
 
 }

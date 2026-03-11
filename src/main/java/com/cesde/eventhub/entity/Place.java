@@ -3,6 +3,8 @@ package com.cesde.eventhub.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "places")
+@SQLDelete(sql = "UPDATE places SET active = false WHERE id = ?")
 public class Place{
 
 	@Id

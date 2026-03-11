@@ -40,9 +40,10 @@ public class EventService {
     
 
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    
+	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public List<EventResponseDTO> getAllEvents() {
-        return eventRepository.findAll().stream()
+        return eventRepository.findAllWithActivePlace().stream()
                 .map(eventMapper::toDTO)
                 .collect(Collectors.toList());
     }
