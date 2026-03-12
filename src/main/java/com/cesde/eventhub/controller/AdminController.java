@@ -52,7 +52,7 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.OK).body(placeService.updatePlace(id, placeDTO));
 	 }
 	
-	@DeleteMapping("eliminarlugar/{id}")
+	@DeleteMapping("eliminar/{id}")
     public ResponseEntity<?> deletePlace(@PathVariable Long id){
 		
 			placeService.deletePlace(id);
