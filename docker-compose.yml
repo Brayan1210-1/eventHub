@@ -1,11 +1,8 @@
-
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: eventhub_db
     environment:
-      # Mapeo directo a tus variables del .env
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -13,18 +10,19 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
 
   app:
     build: .
     container_name: eventhub_app
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     ports:
-      - "${SERVER_PORT:-8081}:8081"
-    restart: always
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    restart: on-failure
 
 volumes:
   postgres_data:
