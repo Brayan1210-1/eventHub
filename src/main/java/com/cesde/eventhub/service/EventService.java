@@ -1,16 +1,21 @@
 package com.cesde.eventhub.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
+import com.cesde.eventhub.dto.request.FilterEventsPublicsDTO;
+import com.cesde.eventhub.dto.response.EventPublicDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
@@ -38,10 +43,9 @@ public class EventService {
     private final UserService userService;
     private final EventMapper eventMapper;
     
-
-
     
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+	
     public List<EventResponseDTO> getAllEvents() {
         return eventRepository.findAllWithActivePlace().stream()
                 .map(eventMapper::toDTO)
@@ -136,6 +140,41 @@ public class EventService {
         eventRepository.save(event);
 
         System.out.println(" Evento cancelado y compradores notificados por email.");
+    }
+    
+  
+    public Page<EventPublicDTO> getPublicEvents(FilterEventsPublicsDTO filters, Pageable pageable) {
+       
+     	LocalDate today = LocalDate.now();
+        LocalDate start = filters.getStartingDate();
+        LocalDate end = filters.getEndDate();
+
+        // 1. Validar que la fecha de inicio no sea pasada (si la enviaron)
+        if (start != null && start.isBefore(today)) {
+            throw new InvalidRegistration("La fecha de inicio no puede ser anterior a hoy.");
+        }
+
+        // 2. Manejo de combinaciones de fechas
+        if (start == null) {
+            // Caso: No mandó inicio, pero sí final. 
+            // Seteamos inicio = hoy para que no traiga eventos viejos.
+            start = today;
+        }
+
+        if (end != null && end.isBefore(start)) {
+            // Caso: La fecha final es antes que la inicial (Error de lógica)
+            throw new InvalidRegistration("La fecha de fin no puede ser anterior a la de inicio.");
+        }
+    	
+        Page<Event> eventsPage = eventRepository.filterEventsPublics(
+            filters.getCategory(),
+            filters.getCity(),
+            start,
+            end,
+            pageable
+        );
+
+        return eventsPage.map(eventMapper::toPublicDTO);
     }
     
     public Event findEventById(Long id) {
