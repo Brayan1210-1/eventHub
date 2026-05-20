@@ -154,7 +154,6 @@ public class EventService {
             throw new InvalidRegistration("La fecha de inicio no puede ser anterior a hoy.");
         }
 
-        // 2. Manejo de combinaciones de fechas
         if (start == null) {
             // Caso: No mandó inicio, pero sí final. 
             // Seteamos inicio = hoy para que no traiga eventos viejos.
