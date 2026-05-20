@@ -2,34 +2,25 @@ package com.cesde.eventhub.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import com.cesde.eventhub.enums.Category;
-import com.cesde.eventhub.enums.EventStatus;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class EventResponseDTO {
-
+@NoArgsConstructor
+public class EventDetailPublicDTO {
     private Long id;
     private String name;
     private String description;
     private LocalDate eventDate;
     private LocalTime startTime;
-    private LocalTime openingTime;
-    private Category category;
     private String imageUrl;
-    private EventStatus status;
-    
- 
     private String placeName;
-    private Long placeId;
-    private String organizerEmail;
+    private String city;
+    private String address;
+    private boolean salesOpen; 
+    private List<ZoneDetailDTO> zones; 
 }

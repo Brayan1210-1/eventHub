@@ -1,11 +1,12 @@
 package com.cesde.eventhub.service;
 
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Page; 
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
@@ -18,7 +19,6 @@ import com.cesde.eventhub.mapper.PlaceMapper;
 import com.cesde.eventhub.repository.PlaceRepository;
 import com.cesde.eventhub.utils.PaginationUtils;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,8 +33,6 @@ public class PlaceService {
 	@Transactional
 	public PlaceDTO createPlace(PlaceDTO place) {
 		
-		
-		
 		Place placeToSave = placeMapper.toEntity(place);
 		placeToSave.setActive(true);
 		Place placeSaved = placeRepository.save(placeToSave);
@@ -43,6 +41,7 @@ public class PlaceService {
 	}
 	
 	@Secured("ROLE_ADMIN")
+	@Transactional(readOnly = true)
 	public PaginatedResponseDTO<PlaceResponseDTO> activesPlaces(Pageable pageable) {
 	    Page<Place> foundPages = placeRepository.findByActiveTrue(pageable); 
 	    
@@ -65,6 +64,7 @@ public class PlaceService {
 	}
 	
 	@Secured("ROLE_ADMIN")
+	@Transactional
 	public void deletePlace(Long id) {
 		
 		Place deletedPlace = findByPlaceId(id);

@@ -1,9 +1,10 @@
 package com.cesde.eventhub.service;
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Page; 
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.request.ZoneRegisterDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
@@ -16,7 +17,6 @@ import com.cesde.eventhub.mapper.ZoneMapper;
 import com.cesde.eventhub.repository.ZoneRepository;
 import com.cesde.eventhub.utils.PaginationUtils;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -63,6 +63,7 @@ public class ZoneService {
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
+	@Transactional(readOnly = true)
 	public PaginatedResponseDTO<ZoneResponseDTO> getZonesByPlace(Long placeId, Pageable pageable) {
 	  
 	    placeService.findByPlaceId(placeId);

@@ -1,7 +1,8 @@
 package com.cesde.eventhub.repository;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,5 +40,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	        @Param("endDate") LocalDate endDate,
 	        Pageable pageable);
 
+	@EntityGraph(attributePaths = {"place", "ticketPrices", "ticketPrices.zone"})
+	@Query("SELECT e FROM Event e WHERE e.id = :id AND e.status = com.cesde.eventhub.enums.EventStatus.PUBLICADO")
+    Optional<Event> findWithDetailsById(Long id);
 
 }

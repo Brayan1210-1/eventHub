@@ -50,7 +50,7 @@ public class ZoneController {
 	@GetMapping("/lugar/{id}")
     public ResponseEntity<PaginatedResponseDTO<ZoneResponseDTO>> getByPlace(
             @PathVariable Long id,
-            @PageableDefault(size = 10, page = 0, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
         
         return ResponseEntity.status(HttpStatus.OK).body(zoneService.getZonesByPlace(id, pageable));
     }
