@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.cesde.eventhub.dto.request.ZoneRegisterDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.ZoneResponseDTO;
 import com.cesde.eventhub.entity.Place;
 import com.cesde.eventhub.entity.Zone;
@@ -13,6 +14,7 @@ import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.ZoneMapper;
 import com.cesde.eventhub.repository.ZoneRepository;
+import com.cesde.eventhub.utils.PaginationUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,12 +63,14 @@ public class ZoneService {
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	public Page<ZoneResponseDTO> getZonesByPlace(Long placeId, Pageable pageable) {
+	public PaginatedResponseDTO<ZoneResponseDTO> getZonesByPlace(Long placeId, Pageable pageable) {
 	  
 	    placeService.findByPlaceId(placeId);
-	    
-	    return zoneRepository.findByPlaceId(placeId, pageable)
-	            .map(zoneMapper::toDTO);
+         
+	   Page<Zone> zones = zoneRepository.findByPlaceId(placeId, pageable);
+	   
+	   return PaginationUtils.toPaginatedResponse(zones, zoneMapper::toDTO);
+	            
 	}
 	
 	@Transactional

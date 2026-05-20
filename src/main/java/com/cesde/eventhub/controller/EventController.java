@@ -1,7 +1,9 @@
 package com.cesde.eventhub.controller;
 
-import java.util.List; 
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.service.EventService;
 
 import jakarta.validation.Valid;
@@ -40,8 +43,9 @@ public class EventController {
     }
     
     @GetMapping("/todos")
-    public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
-        return ResponseEntity.ok(eventService.getAllEvents());
+    public ResponseEntity<PaginatedResponseDTO<EventResponseDTO>> getAllEvents(
+    		@PageableDefault(size = 10, page = 0) Pageable pageable) {
+        return ResponseEntity.ok(eventService.getAllEvents(pageable));
     }
     
     @PatchMapping("/cancelar/{eventId}")

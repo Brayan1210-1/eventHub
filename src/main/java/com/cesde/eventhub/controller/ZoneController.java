@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.request.ZoneRegisterDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.ZoneResponseDTO;
 import com.cesde.eventhub.service.ZoneService;
 
@@ -47,9 +48,9 @@ public class ZoneController {
 	}
 	
 	@GetMapping("/lugar/{id}")
-    public ResponseEntity<Page<ZoneResponseDTO>> getByPlace(
+    public ResponseEntity<PaginatedResponseDTO<ZoneResponseDTO>> getByPlace(
             @PathVariable Long id,
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 10, page = 0, sort = "name") Pageable pageable) {
         
         return ResponseEntity.status(HttpStatus.OK).body(zoneService.getZonesByPlace(id, pageable));
     }

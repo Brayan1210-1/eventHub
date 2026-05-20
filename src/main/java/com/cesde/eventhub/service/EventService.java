@@ -1,10 +1,9 @@
 package com.cesde.eventhub.service;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,7 @@ import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.FilterEventsPublicsDTO;
 import com.cesde.eventhub.dto.response.EventPublicDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.entity.User;
@@ -28,6 +28,7 @@ import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.EventMapper;
 import com.cesde.eventhub.repository.EventRepository;
 import com.cesde.eventhub.repository.OrderRepository;
+import com.cesde.eventhub.utils.PaginationUtils;
 import com.cesde.eventhub.entity.Place;
 
 import jakarta.transaction.Transactional;
@@ -46,10 +47,10 @@ public class EventService {
     
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
 	
-    public List<EventResponseDTO> getAllEvents() {
-        return eventRepository.findAllWithActivePlace().stream()
-                .map(eventMapper::toDTO)
-                .collect(Collectors.toList());
+    public PaginatedResponseDTO<EventResponseDTO> getAllEvents(Pageable pageable) {
+      Page<Event> events = eventRepository.findAllWithActivePlace(pageable);
+           
+       return PaginationUtils.toPaginatedResponse(events, eventMapper::toDTO);
     }
     
     
@@ -58,8 +59,6 @@ public class EventService {
     public EventResponseDTO createEvent(EventRegisterDTO dto) {
         
         Place place = placeService.validatePlaceIsActiveAndExists(dto.getPlaceId());
-        
-         
        
         boolean isOccupied = eventRepository.existsByPlaceIdAndEventDateAndStatusNot(
             place.getId(), 
@@ -143,7 +142,7 @@ public class EventService {
     }
     
   
-    public Page<EventPublicDTO> getPublicEvents(FilterEventsPublicsDTO filters, Pageable pageable) {
+    public PaginatedResponseDTO<EventPublicDTO> getPublicEvents(FilterEventsPublicsDTO filters, Pageable pageable) {
        
      	LocalDate today = LocalDate.now();
         LocalDate start = filters.getStartingDate();
@@ -173,7 +172,7 @@ public class EventService {
             pageable
         );
 
-        return eventsPage.map(eventMapper::toPublicDTO);
+        return PaginationUtils.toPaginatedResponse(eventsPage, eventMapper::toPublicDTO);
     }
     
     public Event findEventById(Long id) {
