@@ -1,6 +1,6 @@
 package com.cesde.eventhub.controller;
 
-import org.springframework.data.domain.Page;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.service.PlaceService;
 
@@ -39,7 +40,7 @@ public class AdminController {
 	}
 	
 	@GetMapping("/lugaresactivos")
-	public ResponseEntity<Page<PlaceResponseDTO>> activesPlaces( 
+	public ResponseEntity<PaginatedResponseDTO<PlaceResponseDTO>> activesPlaces( 
 			@PageableDefault(size = 10, page = 0) Pageable pageable){
 		return ResponseEntity.ok(placeService.activesPlaces(pageable));
 	}

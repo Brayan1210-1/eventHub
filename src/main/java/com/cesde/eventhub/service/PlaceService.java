@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.PlaceMapper;
 import com.cesde.eventhub.repository.PlaceRepository;
+import com.cesde.eventhub.utils.PaginationUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +43,10 @@ public class PlaceService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public Page<PlaceResponseDTO> activesPlaces(Pageable pageable) {
-	    return placeRepository.findByActiveTrue(pageable)
-	            .map(placeMapper::toPage); 
+	public PaginatedResponseDTO<PlaceResponseDTO> activesPlaces(Pageable pageable) {
+	    Page<Place> foundPages = placeRepository.findByActiveTrue(pageable); 
+	    
+	    return PaginationUtils.toPaginatedResponse(foundPages, placeMapper::toPage);
 	}
 	
 	@Secured("ROLE_ADMIN")

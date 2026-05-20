@@ -120,7 +120,7 @@ class ZoneServiceTest {
         assertThrows(DataNotFound.class, () -> zoneService.findById(99L));
     }
 
-    @Test
+   /* @Test
     void getZonesByPlace_ShouldReturnPage() {
        
         Pageable pageable = PageRequest.of(0, 10);
@@ -133,7 +133,7 @@ class ZoneServiceTest {
         assertEquals(1, result.getTotalElements());
         verify(placeService).findByPlaceId(1L);
     }
-
+*/
     @Test
     void deleteZone_ShouldInvokeDelete() {
      

@@ -23,7 +23,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	boolean existsByPlaceIdAndEventDateAndStatusNot(Long placeId, LocalDate eventDate, EventStatus status);
 	
 	@Query("SELECT e FROM Event e JOIN FETCH e.place p WHERE p.active = true")
-	List<Event> findAllWithActivePlace();
+	Page<Event> findAllWithActivePlace(Pageable pageable);
 	
 	@EntityGraph(attributePaths = {"ticketPrices", "place"})
 	@Query("SELECT e FROM Event e " +
