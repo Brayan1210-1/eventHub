@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,9 @@ import com.cesde.eventhub.entity.Role;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.UserRoles;
 import com.cesde.eventhub.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.cesde.eventhub.repository.RoleRepository;
 
 @SpringBootApplication
@@ -23,7 +27,14 @@ public class EventhubApplication {
 		SpringApplication.run(EventhubApplication.class, args);
 	}
 	
+	@Value("${spring.security.user.name}")
+	String emailAdmin;
+	
+	@Value("${spring.security.user.password}")
+	String passwordAdmin;
+	
 	 @Bean
+	 @Transactional
 	    public CommandLineRunner initData(UserRepository userRepository,
 	                                      PasswordEncoder passwordEncoder, 
 	                                      RoleRepository roleRepository) {
@@ -37,7 +48,6 @@ public class EventhubApplication {
 		            }
 		        }
 	        	
-	        	String emailAdmin = "admin@gmail.com";
 	        	
 	        	if(userRepository.findByEmail(emailAdmin).isEmpty()) {
 	        		
@@ -45,7 +55,7 @@ public class EventhubApplication {
 	           
 	            admin.setEmail(emailAdmin);
 	            admin.setActive(true);
-	            admin.setPassword(passwordEncoder.encode("Admin123"));
+	            admin.setPassword(passwordEncoder.encode(passwordAdmin));
 	            
 	            Optional<Role> roleOpt = roleRepository.findByNameRole(UserRoles.ADMIN);
 	            Role role = roleOpt.get();
