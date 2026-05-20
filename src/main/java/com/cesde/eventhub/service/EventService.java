@@ -1,6 +1,6 @@
 package com.cesde.eventhub.service;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;  
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.FilterEventsPublicsDTO;
+import com.cesde.eventhub.dto.response.EventDetailPublicDTO;
 import com.cesde.eventhub.dto.response.EventPublicDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
@@ -31,7 +32,7 @@ import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.utils.PaginationUtils;
 import com.cesde.eventhub.entity.Place;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,7 +47,7 @@ public class EventService {
     
     
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
-	
+	@Transactional(readOnly = true)
     public PaginatedResponseDTO<EventResponseDTO> getAllEvents(Pageable pageable) {
       Page<Event> events = eventRepository.findAllWithActivePlace(pageable);
            
@@ -141,7 +142,7 @@ public class EventService {
         System.out.println(" Evento cancelado y compradores notificados por email.");
     }
     
-  
+    @Transactional(readOnly = true)
     public PaginatedResponseDTO<EventPublicDTO> getPublicEvents(FilterEventsPublicsDTO filters, Pageable pageable) {
        
      	LocalDate today = LocalDate.now();
@@ -173,6 +174,13 @@ public class EventService {
         );
 
         return PaginationUtils.toPaginatedResponse(eventsPage, eventMapper::toPublicDTO);
+    }
+    
+    @Transactional(readOnly = true)
+    public EventDetailPublicDTO getEventDetail(Long id) {
+        Event event = eventRepository.findWithDetailsById(id)
+                .orElseThrow(() -> new DataNotFound("El evento con ID " + id + " no fue encontrado."));
+        return eventMapper.toDetailDTO(event);
     }
     
     public Event findEventById(Long id) {

@@ -21,5 +21,6 @@ public interface ZoneRepository extends JpaRepository<Zone, Long>{
 	@Query("SELECT SUM(z.capacity) FROM Zone z WHERE z.place.id = :placeId")
     Integer sumCapacityByPlaceId(@Param("placeId") Long placeId);
 	
+	@Query("SELECT z FROM Zone z WHERE z.place.id = :placeId")
 	Page<Zone> findByPlaceId(Long placeId, Pageable pageable);
 }

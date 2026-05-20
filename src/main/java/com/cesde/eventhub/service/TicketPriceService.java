@@ -1,6 +1,6 @@
 package com.cesde.eventhub.service;
 
-import java.util.List;
+import java.util.List; 
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,7 +16,7 @@ import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.TicketPriceMapper;
 import com.cesde.eventhub.repository.TicketPriceRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -58,7 +58,8 @@ public class TicketPriceService {
 	}
 	
 	 @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
-	public List<TicketPriceResponseDTO> getPricesByEvent(Long eventId) {
+	 @Transactional(readOnly = true)
+		public List<TicketPriceResponseDTO> getPricesByEvent(Long eventId) {
 	  
 	    eventService.findEventById(eventId);
 	    
