@@ -20,7 +20,6 @@ import com.cesde.eventhub.entity.Ticket;
 import com.cesde.eventhub.entity.TicketPrice;
 import com.cesde.eventhub.entity.User;
 import com.cesde.eventhub.enums.OrderStatus;
-import com.cesde.eventhub.enums.PaymentMethod;
 import com.cesde.eventhub.enums.TicketStatus;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
@@ -28,7 +27,6 @@ import com.cesde.eventhub.mapper.OrderMapper;
 import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.repository.TicketPriceRepository;
 import com.cesde.eventhub.repository.TicketRepository;
-import com.cesde.eventhub.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +95,8 @@ public class OrderService {
         
         return orderMapper.toResponseDTO(savedOrder, expirationTime);
     }
+    
+    
     
 
     @Scheduled(fixedRate = 60000)

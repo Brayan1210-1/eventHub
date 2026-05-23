@@ -1,6 +1,6 @@
 package com.cesde.eventhub.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDateTime; 
 import java.util.UUID;
 
 import com.cesde.eventhub.enums.TicketStatus;
@@ -41,7 +41,7 @@ public class Ticket {
     private TicketPrice ticketPrice;
 
     @Column(unique = true)
-    private String code; 
+    private UUID code; 
 
     @Enumerated(EnumType.STRING)
     private TicketStatus status = TicketStatus.ACTIVA;

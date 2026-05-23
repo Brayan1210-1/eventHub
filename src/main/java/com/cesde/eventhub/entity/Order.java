@@ -1,8 +1,10 @@
 package com.cesde.eventhub.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDateTime;  
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 
 import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.enums.PaymentMethod;
@@ -28,17 +30,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-@Entity // 1. Faltaba esta anotación vital para que JPA la reconozca
-@Table(name = "orders") // 2. CRÍTICO: "ORDER" es una palabra reservada en SQL. Si no le pones "orders" en plural, PostgreSQL explotará.
-@Getter // 3. Te faltaba el Getter. (Ojo: No uses @Data en entidades JPA porque causa ciclos infinitos con el OneToMany)
+@Entity
+@Table(name = "orders") 
+@Getter 
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
