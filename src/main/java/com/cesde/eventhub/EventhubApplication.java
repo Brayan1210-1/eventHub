@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.cesde.eventhub.entity.Role;
@@ -21,6 +22,7 @@ import jakarta.transaction.Transactional;
 import com.cesde.eventhub.repository.RoleRepository;
 
 @SpringBootApplication
+@EnableScheduling
 public class EventhubApplication {
 
 	public static void main(String[] args) {

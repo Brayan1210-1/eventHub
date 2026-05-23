@@ -42,6 +42,7 @@ public interface EventMapper {
     EventDetailPublicDTO toDetailDTO(Event event);
     
     @Mapping(source = "zone.name", target = "zoneName") 
+    @Mapping(source = "zone.id", target = "id")
     ZoneDetailDTO toZoneDetailDTO(TicketPrice ticketPrice);
     
     default boolean isSalesOpen(Event event) {

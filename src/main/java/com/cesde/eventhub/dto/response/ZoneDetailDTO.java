@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ZoneDetailDTO {
+	private Long id;
     private String zoneName;
     private Double price;
     private Integer availableQuantity;
