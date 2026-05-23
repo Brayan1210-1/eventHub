@@ -1,5 +1,6 @@
 package com.cesde.eventhub.dto.request;
 
+
 import com.cesde.eventhub.enums.PaymentMethod;
 
 import jakarta.validation.constraints.NotNull;
@@ -12,12 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConfirmPay {
 
-	@NotNull
-	private Long order_id;
-	
-	@NotNull
+	@NotNull(message = "El método de pago es obligatorio")
 	private PaymentMethod paymentMethod;
 	
-	@NotNull
+	@NotNull(message = "La referencia de pago es obligatoria")
 	private String paymentReference;
 }

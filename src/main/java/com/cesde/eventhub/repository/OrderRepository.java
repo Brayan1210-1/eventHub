@@ -14,7 +14,7 @@ import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.enums.OrderStatus;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByEventId(Long eventId);
     
     @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt < :limitTime")
