@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.entity.Event;
@@ -23,6 +24,7 @@ import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.enums.TicketStatus;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
+import com.cesde.eventhub.exception.custom.Unauthorized;
 import com.cesde.eventhub.mapper.OrderMapper;
 import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.repository.TicketPriceRepository;
@@ -97,8 +99,52 @@ public class OrderService {
     }
     
     
-    
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Transactional
+    public OrderResponseDTO confirmPayment(UUID orderId, ConfirmPay request) {
+      
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID userId = UUID.fromString(username);
 
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFound("La orden especificada no existe."));
+
+        if (!order.getClient().getId().equals(userId)) {
+            throw new Unauthorized("No tienes permiso para modificar esta orden.");
+        }
+        
+        if (order.getStatus() != OrderStatus.PENDIENTE) {
+            throw new InvalidRegistration("La orden no está en estado PENDIENTE.");
+        }
+
+        if (LocalDateTime.now().isAfter(order.getExpirationDate())) {
+            throw new InvalidRegistration("El tiempo para pagar esta orden ha expirado.");
+        }
+
+        order.setStatus(OrderStatus.PAGADA);
+        order.setPaymentMethod(request.getPaymentMethod());
+        order.setPaymentReference(request.getPaymentReference());
+
+        
+        order.getTickets().forEach(ticket -> {
+            ticket.setCode(UUID.randomUUID());
+            ticket.setStatus(TicketStatus.ACTIVA); 
+        });
+
+        Order savedOrder = orderRepository.save(order);
+
+        System.out.println(" PAGO CONFIRMADO EXITOSAMENTE");
+        System.out.println(" Orden ID: " + savedOrder.getId());
+        System.out.println(" Referencia: " + savedOrder.getPaymentReference());
+        System.out.println(" Confirmación enviada al cliente: " + order.getClient().getEmail());
+
+
+        return orderMapper.toResponseDTO(savedOrder, savedOrder.getExpirationDate());
+    }
+
+    
+    
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void releaseExpiredTickets() {
