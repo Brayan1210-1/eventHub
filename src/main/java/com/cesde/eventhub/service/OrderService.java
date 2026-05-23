@@ -106,13 +106,9 @@ public class OrderService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID userId = UUID.fromString(username);
 
-        
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new DataNotFound("La orden especificada no existe."));
+        Order order = findById(orderId);
 
-        if (!order.getClient().getId().equals(userId)) {
-            throw new Unauthorized("No tienes permiso para modificar esta orden.");
-        }
+       validateOwner(userId, order);
         
         if (order.getStatus() != OrderStatus.PENDIENTE) {
             throw new InvalidRegistration("La orden no está en estado PENDIENTE.");
@@ -144,6 +140,30 @@ public class OrderService {
     }
 
     
+    @PreAuthorize("hasAuthority('CLIENTE') or hasRole('CLIENTE')")
+    @Transactional
+    public OrderResponseDTO cancelOrder(UUID orderId) {
+       
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID userId = UUID.fromString(username);
+
+        Order order = findById(orderId);
+
+          validateOwner(userId, order);
+
+        if (order.getStatus() != OrderStatus.PENDIENTE) {
+            throw new InvalidRegistration("Solo se pueden cancelar órdenes que estén en estado PENDIENTE.");
+        }
+
+        order.setStatus(OrderStatus.CANCELADA);
+
+        ticketRepository.deleteAll(order.getTickets());
+        order.getTickets().clear();
+
+        Order savedOrder = orderRepository.save(order);
+
+        return orderMapper.toResponseDTO(savedOrder, savedOrder.getExpirationDate());
+    }
     
     @Scheduled(fixedRate = 60000)
     @Transactional
@@ -177,4 +197,21 @@ public class OrderService {
         orderRepository.saveAll(expiredOrders);
         log.info("Limpieza de inventario temporal completada exitosamente.");
     }
+    
+    public Order findById(UUID orderId) {
+    	 Order order = orderRepository.findById(orderId)
+                 .orElseThrow(() -> new DataNotFound("La orden especificada no existe."));
+  
+    return order;
+    }
+    
+    public void validateOwner(UUID userId, Order order) {
+    
+    	   if (!order.getClient().getId().equals(userId)) {
+            throw new Unauthorized("No tienes permiso para cancelar esta orden.");
+        }
+    }
+    
+    
+    
 }
