@@ -46,5 +46,6 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private TicketStatus status = TicketStatus.ACTIVA;
 
+    @Column(updatable = false)
     private LocalDateTime usedDate;
 }

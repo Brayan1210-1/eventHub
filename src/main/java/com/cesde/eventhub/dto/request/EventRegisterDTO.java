@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.cesde.eventhub.enums.Category;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -36,7 +37,10 @@ public class EventRegisterDTO {
     private Category category;
     private String imageUrl;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime salesStartDate;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime salesEndDate;
 
     @NotNull(message = "Place ID is required")
