@@ -37,10 +37,14 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     
     @Query("SELECT o FROM Order o WHERE o.event.organizer.id = :organizerId " +
             "AND (:eventId IS NULL OR o.event.id = :eventId) " +
-            "AND (:status IS NULL OR o.status = :status)")
+            "AND (:status IS NULL OR o.status = :status) " +
+            "AND (CAST(:startDate AS timestamp) IS NULL OR o.createdAt >= :startDate) " +
+            "AND (CAST(:endDate AS timestamp) IS NULL OR o.createdAt < :endDate)")
      Page<Order> findOrganizerSalesWithFilters(
              @Param("organizerId") UUID organizerId,
              @Param("eventId") Long eventId,
              @Param("status") OrderStatus status,
+             @Param("startDate") LocalDateTime startDate,
+             @Param("endDate") LocalDateTime endDate,
              Pageable pageable);
 }
