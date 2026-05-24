@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
+import com.cesde.eventhub.dto.request.TicketValidationRequestDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
+import com.cesde.eventhub.dto.response.TicketValidationResponseDTO;
 import com.cesde.eventhub.service.EventService;
+import com.cesde.eventhub.service.TicketService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class EventController {
 
     private final EventService eventService;
+    private final TicketService ticketService;
 
     @PostMapping("/crear")
     public ResponseEntity<EventResponseDTO> createEvent(@Valid @RequestBody EventRegisterDTO dto) {
@@ -55,5 +60,13 @@ public class EventController {
         
         return ResponseEntity.ok("El evento ha sido cancelado exitosamente " +
                 "Las órdenes pagadas han sido marcadas para reembolso y las boletas anuladas");
+    }
+    
+    @PostMapping("/boletas/validar")
+    @PreAuthorize("hasRole('ORGANIZADOR')")
+    public ResponseEntity<TicketValidationResponseDTO> scanAndValidateTicket(
+            @Valid @RequestBody TicketValidationRequestDTO request) {
+        
+        return ResponseEntity.ok(ticketService.validateTicket(request));
     }
 }
