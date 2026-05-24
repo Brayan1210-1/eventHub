@@ -29,4 +29,6 @@ public interface UserMapper {
                 .map(role -> role.getNameRole().name()) // Convierte el Enum a String (ej: "ADMIN")
                 .collect(Collectors.toSet());
     }
+
+	UserResponseDTO toResponseDTO(User savedUser);
 }

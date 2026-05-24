@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.request.ConfirmPay;
+import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.service.OrderService;
@@ -44,5 +45,13 @@ public class OrderController {
             @PathVariable UUID id) {
         
         return ResponseEntity.ok(orderService.cancelOrder(id));
+    }
+    
+    @PostMapping("/venta-fisica")
+    public ResponseEntity<OrderResponseDTO> createPhysicalSale(
+            @Valid @RequestBody PhysicalSaleRequestDTO request) {
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.createPhysicalSale(request));
     }
 }

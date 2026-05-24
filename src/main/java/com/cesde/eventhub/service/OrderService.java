@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.request.ConfirmPay;
+import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
+import com.cesde.eventhub.entity.Client;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.entity.Ticket;
@@ -26,6 +28,7 @@ import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.exception.custom.Unauthorized;
 import com.cesde.eventhub.mapper.OrderMapper;
+import com.cesde.eventhub.repository.ClientRepository;
 import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.repository.TicketPriceRepository;
 import com.cesde.eventhub.repository.TicketRepository;
@@ -43,6 +46,9 @@ public class OrderService {
     private final TicketRepository ticketRepository;
     private final UserService userService;
     private final OrderMapper orderMapper;
+    private final EventService eventService;
+    private final ClientService clientService;
+    private final ClientRepository clientRepository;
 
     
     @PreAuthorize("hasRole('CLIENTE')")
@@ -51,7 +57,7 @@ public class OrderService {
     	String user = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID userId = UUID.fromString(user);
         
-        User client = userService.findById(userId);
+        Client client = clientService.findByUserId(userId);
                
         TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneIdWithLock(request.getEventId(), request.getZoneId())
                 .orElseThrow(() -> new DataNotFound("Zona o evento no disponible"));
@@ -133,7 +139,7 @@ public class OrderService {
         System.out.println(" PAGO CONFIRMADO EXITOSAMENTE");
         System.out.println(" Orden ID: " + savedOrder.getId());
         System.out.println(" Referencia: " + savedOrder.getPaymentReference());
-        System.out.println(" Confirmación enviada al cliente: " + order.getClient().getEmail());
+        System.out.println(" Confirmación enviada al cliente: " + order.getClient().getUser().getEmail());
 
 
         return orderMapper.toResponseDTO(savedOrder, savedOrder.getExpirationDate());
@@ -164,6 +170,69 @@ public class OrderService {
 
         return orderMapper.toResponseDTO(savedOrder, savedOrder.getExpirationDate());
     }
+    
+    
+    @PreAuthorize("hasRole('VENDEDOR')")
+    @Transactional
+    public OrderResponseDTO createPhysicalSale(PhysicalSaleRequestDTO request) {
+       
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID sellerId = UUID.fromString(username);
+        User seller = userService.findById(sellerId);
+                
+
+        Event event = eventService.findEventById(request.getEventId());
+               
+        
+        TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneId(request.getEventId(), request.getZoneId())
+                .orElseThrow(() -> new DataNotFound("La zona especificada no está configurada para este evento."));
+
+       
+        Client client = clientRepository.findByDocument(request.getBuyerDocument())
+                .orElseGet(() -> {
+                    Client newClient = new Client();
+                    newClient.setDocument(request.getBuyerDocument());
+                    newClient.setName(request.getBuyerName());
+                    newClient.setPhone(request.getBuyerPhone());
+                    newClient.setLastName(request.getBuyerLastName());
+                    return clientRepository.save(newClient);
+                });
+
+       
+        Order order = new Order();
+        order.setClient(client);
+        order.setSeller(seller); 
+        order.setEvent(event);
+        order.setStatus(OrderStatus.PAGADA); 
+        order.setTotal(ticketPrice.getPrice() * request.getQuantity());
+        order.setPaymentMethod(request.getPaymentMethod());
+        order.setPaymentReference("TAQUILLA-" + UUID.randomUUID().toString().substring(0, 8));
+        order.setExpirationDate(LocalDateTime.now().plusYears(1)); 
+        
+        Order savedOrder = orderRepository.saveAndFlush(order);
+
+        List<Ticket> tickets = IntStream.range(0, request.getQuantity())
+                .mapToObj(i -> {
+                    Ticket ticket = new Ticket();
+                    ticket.setOrder(savedOrder);
+                    ticket.setTicketPrice(ticketPrice);
+                    ticket.setStatus(TicketStatus.ACTIVA); 
+                    ticket.setCode(UUID.randomUUID()); 
+                    return ticket;
+                }).toList();
+        
+        ticketRepository.saveAll(tickets);
+
+       
+        
+        System.out.println("Vendedor: " + seller.getEmail());
+        System.out.println("Comprador: " + client.getName() + " - Doc: " + client.getDocument());
+        System.out.println("Cantidad: " + request.getQuantity() + " boleta(s) en zona ID: " + request.getZoneId());
+        System.out.println("Total Recaudado: $" + order.getTotal());
+
+        return orderMapper.toResponseDTO(savedOrder, null); 
+    }
+    
     
     @Scheduled(fixedRate = 60000)
     @Transactional
@@ -207,8 +276,8 @@ public class OrderService {
     
     public void validateOwner(UUID userId, Order order) {
     
-    	   if (!order.getClient().getId().equals(userId)) {
-            throw new Unauthorized("No tienes permiso para cancelar esta orden.");
+    	if (order.getClient().getUser() == null || !order.getClient().getUser().getId().equals(userId)) {
+            throw new Unauthorized("No tienes permiso para modificar o cancelar esta orden.");
         }
     }
     
