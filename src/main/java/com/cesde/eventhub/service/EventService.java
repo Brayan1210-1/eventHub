@@ -149,14 +149,13 @@ public class EventService {
         LocalDate start = filters.getStartingDate();
         LocalDate end = filters.getEndDate();
 
-        // 1. Validar que la fecha de inicio no sea pasada (si la enviaron)
+      
         if (start != null && start.isBefore(today)) {
             throw new InvalidRegistration("La fecha de inicio no puede ser anterior a hoy.");
         }
 
         if (start == null) {
-            // Caso: No mandó inicio, pero sí final. 
-            // Seteamos inicio = hoy para que no traiga eventos viejos.
+           
             start = today;
         }
 

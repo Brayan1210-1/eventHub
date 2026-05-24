@@ -4,17 +4,23 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
+import com.cesde.eventhub.dto.response.MyOrderDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
+import com.cesde.eventhub.enums.OrderFilter;
 import com.cesde.eventhub.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -53,5 +59,15 @@ public class OrderController {
         
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderService.createPhysicalSale(request));
+    }
+    
+    @GetMapping("/mis-boletas")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<PaginatedResponseDTO<MyOrderDTO>> getMyOrders(
+            @RequestParam(required = false, defaultValue = "UPCOMING") OrderFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) { 
+        
+        return ResponseEntity.ok(orderService.getMyOrders(filter, page, size));
     }
 }

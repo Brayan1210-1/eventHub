@@ -1,11 +1,16 @@
 package com.cesde.eventhub.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,13 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
+import com.cesde.eventhub.dto.response.MyOrderDTO;
+import com.cesde.eventhub.dto.response.MyTicketDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
+import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.entity.Client;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.entity.Ticket;
 import com.cesde.eventhub.entity.TicketPrice;
 import com.cesde.eventhub.entity.User;
+import com.cesde.eventhub.enums.OrderFilter;
 import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.enums.TicketStatus;
 import com.cesde.eventhub.exception.custom.DataNotFound;
@@ -32,6 +41,7 @@ import com.cesde.eventhub.repository.ClientRepository;
 import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.repository.TicketPriceRepository;
 import com.cesde.eventhub.repository.TicketRepository;
+import com.cesde.eventhub.utils.PaginationUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -233,6 +243,35 @@ public class OrderService {
         return orderMapper.toResponseDTO(savedOrder, null); 
     }
     
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Transactional(readOnly = true)
+    public PaginatedResponseDTO<MyOrderDTO> getMyOrders(OrderFilter filter, int page, int size) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID userId = UUID.fromString(username);
+        LocalDate now = LocalDate.now();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Order> orderPage;
+
+        if (filter == OrderFilter.UPCOMING) {
+            
+            orderPage = orderRepository.findByClient_UserIdAndStatusAndEvent_EventDateGreaterThanEqual(
+                    userId, OrderStatus.PAGADA, now, pageable);
+        } else if (filter == OrderFilter.PAST) {
+           
+            orderPage = orderRepository.findByClient_UserIdAndStatusAndEvent_EventDateLessThan(
+                    userId, OrderStatus.PAGADA, now, pageable);
+        } else {
+            orderPage = orderRepository.findByClient_UserIdAndStatus(
+                    userId, OrderStatus.PAGADA, pageable);
+        }
+        
+      
+        return PaginationUtils.toPaginatedResponse(orderPage, this::mapToMyOrderDTO);
+    }
+    
+    
     
     @Scheduled(fixedRate = 60000)
     @Transactional
@@ -272,6 +311,27 @@ public class OrderService {
                  .orElseThrow(() -> new DataNotFound("La orden especificada no existe."));
   
     return order;
+    }
+    
+    private MyOrderDTO mapToMyOrderDTO(Order order) {
+        MyOrderDTO dto = new MyOrderDTO();
+        dto.setOrderId(order.getId());
+        dto.setEventName(order.getEvent().getName()); 
+        dto.setEventDate(order.getEvent().getEventDate()); 
+        dto.setOrderStatus(order.getStatus().name());
+
+       
+        List<MyTicketDTO> ticketDTOs = order.getTickets().stream().map(t -> {
+            MyTicketDTO tdto = new MyTicketDTO();
+            tdto.setTicketId(t.getId()); 
+            tdto.setCode(t.getCode()); 
+            tdto.setStatus(t.getStatus().name());
+            tdto.setZoneName(t.getTicketPrice().getZone().getName()); 
+            return tdto;
+        }).toList();
+
+        dto.setTickets(ticketDTOs);
+        return dto;
     }
     
     public void validateOwner(UUID userId, Order order) {
