@@ -22,6 +22,7 @@ import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.MyOrderDTO;
 import com.cesde.eventhub.dto.response.MyTicketDTO;
+import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.entity.Client;
@@ -269,6 +270,23 @@ public class OrderService {
         
       
         return PaginationUtils.toPaginatedResponse(orderPage, this::mapToMyOrderDTO);
+    }
+    
+    @PreAuthorize("hasRole('ORGANIZADOR')")
+    @Transactional(readOnly = true)
+    public PaginatedResponseDTO<OrderHistoryResponseDTO> getOrganizerSalesHistory(
+            Long eventId, OrderStatus status, int page, int size) {
+        
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID organizerId = UUID.fromString(username);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Order> orderPage = orderRepository.findOrganizerSalesWithFilters(
+                organizerId, eventId, status, pageable);
+
+     
+        return PaginationUtils.toPaginatedResponse(orderPage, orderMapper::toHistoryDTO);
     }
     
     
