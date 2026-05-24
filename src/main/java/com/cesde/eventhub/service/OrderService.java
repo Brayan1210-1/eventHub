@@ -275,21 +275,26 @@ public class OrderService {
     @PreAuthorize("hasRole('ORGANIZADOR')")
     @Transactional(readOnly = true)
     public PaginatedResponseDTO<OrderHistoryResponseDTO> getOrganizerSalesHistory(
-            Long eventId, OrderStatus status, int page, int size) {
+            Long eventId, OrderStatus status, LocalDate purchaseDate, int page, int size) {
         
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID organizerId = UUID.fromString(username);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        Page<Order> orderPage = orderRepository.findOrganizerSalesWithFilters(
-                organizerId, eventId, status, pageable);
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        
+        if (purchaseDate != null) {
+            startDate = purchaseDate.atStartOfDay(); 
+            endDate = purchaseDate.plusDays(1).atStartOfDay();
+        }
 
-     
+        Page<Order> orderPage = orderRepository.findOrganizerSalesWithFilters(
+                organizerId, eventId, status, startDate, endDate, pageable);
+
         return PaginationUtils.toPaginatedResponse(orderPage, orderMapper::toHistoryDTO);
     }
-    
-    
     
     @Scheduled(fixedRate = 60000)
     @Transactional
