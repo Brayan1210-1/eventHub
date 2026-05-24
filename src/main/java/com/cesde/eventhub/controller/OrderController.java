@@ -18,9 +18,11 @@ import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.MyOrderDTO;
+import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.enums.OrderFilter;
+import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -70,4 +72,5 @@ public class OrderController {
         
         return ResponseEntity.ok(orderService.getMyOrders(filter, page, size));
     }
+    
 }

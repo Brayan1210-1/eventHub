@@ -11,15 +11,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.TicketValidationRequestDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
+import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.TicketValidationResponseDTO;
+import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.service.EventService;
+import com.cesde.eventhub.service.OrderService;
 import com.cesde.eventhub.service.TicketService;
 
 import jakarta.validation.Valid;
@@ -32,6 +36,8 @@ public class EventController {
 
     private final EventService eventService;
     private final TicketService ticketService;
+    private final OrderService orderService;
+    
 
     @PostMapping("/crear")
     public ResponseEntity<EventResponseDTO> createEvent(@Valid @RequestBody EventRegisterDTO dto) {
@@ -68,5 +74,16 @@ public class EventController {
             @Valid @RequestBody TicketValidationRequestDTO request) {
         
         return ResponseEntity.ok(ticketService.validateTicket(request));
+    }
+    
+    @GetMapping("/mis-ventas")
+    @PreAuthorize("hasRole('ORGANIZADOR')")
+    public ResponseEntity<PaginatedResponseDTO<OrderHistoryResponseDTO>> getOrganizerSalesHistory(
+            @RequestParam(required = false) Long eventId,
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        return ResponseEntity.ok(orderService.getOrganizerSalesHistory(eventId, status, page, size));
     }
 }

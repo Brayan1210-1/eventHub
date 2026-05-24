@@ -34,4 +34,13 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
    
     Page<Order> findByClient_UserIdAndStatusAndEvent_EventDateLessThan(
             UUID userId, OrderStatus status, LocalDate date, Pageable pageable);
+    
+    @Query("SELECT o FROM Order o WHERE o.event.organizer.id = :organizerId " +
+            "AND (:eventId IS NULL OR o.event.id = :eventId) " +
+            "AND (:status IS NULL OR o.status = :status)")
+     Page<Order> findOrganizerSalesWithFilters(
+             @Param("organizerId") UUID organizerId,
+             @Param("eventId") Long eventId,
+             @Param("status") OrderStatus status,
+             Pageable pageable);
 }
