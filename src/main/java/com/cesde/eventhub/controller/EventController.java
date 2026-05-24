@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.eventhub.dto.EventCancelDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.TicketValidationRequestDTO;
+import com.cesde.eventhub.dto.response.EventReportResponseDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
@@ -89,5 +90,11 @@ public class EventController {
             @RequestParam(defaultValue = "10") int size) {
         
         return ResponseEntity.ok(orderService.getOrganizerSalesHistory(eventId, status, purchaseDate, page, size));
+    }
+    
+    @GetMapping("/{eventId}/reporte")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    public ResponseEntity<EventReportResponseDTO> getEventReport(@PathVariable Long eventId) {
+        return ResponseEntity.ok(eventService.getEventReport(eventId));
     }
 }
