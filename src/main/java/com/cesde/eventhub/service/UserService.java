@@ -1,12 +1,16 @@
 package com.cesde.eventhub.service;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.LoginDTO;
+import com.cesde.eventhub.dto.request.AdminUserRegisterDTO;
 import com.cesde.eventhub.dto.request.UserRegisterDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.entity.Role;
@@ -97,6 +101,45 @@ public class UserService {
 		    }
 		
 	}
+		
+		@Transactional
+		@PreAuthorize(value = "hasRole('ADMIN')")
+	    public UserResponseDTO createUserByAdmin(AdminUserRegisterDTO dto) {
+	        
+	        if (userRepository.existsByEmail(dto.getEmail())) {
+	            throw new InvalidRegistration("El correo electrónico ya se encuentra registrado.");
+	        }
+
+	        User newUser = new User();
+	        newUser.setEmail(dto.getEmail());
+	        newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+	        
+	       
+	        newUser.setActive(true); 
+
+	      
+	        Set<Role> userRoles = new HashSet<>();
+	        for (UserRoles roleEnum : dto.getRoles()) {
+	            Role role = roleRepository.findByNameRole(roleEnum)
+	                    .orElseThrow(() -> new DataNotFound("El rol '" + roleEnum + "' no existe en la base de datos."));
+	            userRoles.add(role);
+	        }
+	        newUser.setRoles(userRoles); 
+
+	        User savedUser = userRepository.save(newUser);
+
+	     
+	        boolean hasClienteRole = dto.getRoles().contains(UserRoles.CLIENTE);
+
+	        if (hasClienteRole) {
+	            Client client = new Client();
+	            client.setUser(savedUser);
+	            client.setName("Usuario Registrado por Admin");
+	            clientRepository.save(client);
+	        }
+
+	        return userMapper.toResponseDTO(savedUser);
+	    }
 	
 	public void validateData(UserRegisterDTO userDTO) {
 		

@@ -64,7 +64,6 @@ public class User {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Client client;
 	
-	
 	@Column(name = "created_At", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 

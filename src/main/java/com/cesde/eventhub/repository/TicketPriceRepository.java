@@ -20,4 +20,6 @@ public interface TicketPriceRepository extends JpaRepository<TicketPrice, Long> 
     @Query("SELECT tp FROM TicketPrice tp WHERE tp.event.id = :eventId AND tp.zone.id = :zoneId")
     Optional<TicketPrice> findByEventIdAndZoneIdWithLock(@Param("eventId") Long eventId, @Param("zoneId") Long zoneId);
 
+	
+	Optional<TicketPrice> findByEventIdAndZoneId(Long eventId, Long zoneId);
 }

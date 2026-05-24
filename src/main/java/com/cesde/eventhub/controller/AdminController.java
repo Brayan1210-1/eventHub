@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.PlaceDTO;
+import com.cesde.eventhub.dto.request.AdminUserRegisterDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
+import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.service.PlaceService;
+import com.cesde.eventhub.service.UserService;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/admin")
 public class AdminController {
 	
-	
+	private final UserService userService;
 	private final PlaceService placeService;
  
 	@PostMapping("/crearlugar")
@@ -58,9 +61,14 @@ public class AdminController {
 		
 			placeService.deletePlace(id);
 			  return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado correctamente");
-		
-  	
   			  
+    }
+	
+	
+    @PostMapping("/crear/usuarios")
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody AdminUserRegisterDTO request) {
+        UserResponseDTO response = userService.createUserByAdmin(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 	
 	
