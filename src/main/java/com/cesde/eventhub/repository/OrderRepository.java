@@ -47,4 +47,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
              @Param("startDate") LocalDateTime startDate,
              @Param("endDate") LocalDateTime endDate,
              Pageable pageable);
+    
+    long countByStatusAndCreatedAtBetween(OrderStatus status, LocalDateTime start, LocalDateTime end);
 }

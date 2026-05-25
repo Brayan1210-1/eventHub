@@ -10,19 +10,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.AdminUserRegisterDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
+import com.cesde.eventhub.dto.response.GeneralReportResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
+import com.cesde.eventhub.service.OrderService;
 import com.cesde.eventhub.service.PlaceService;
 import com.cesde.eventhub.service.UserService;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +40,7 @@ public class AdminController {
 	
 	private final UserService userService;
 	private final PlaceService placeService;
+	private final OrderService orderService;
  
 	@PostMapping("/crearlugar")
 	public ResponseEntity<?> createPlace(@Valid @RequestBody PlaceDTO place){
@@ -69,6 +76,15 @@ public class AdminController {
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody AdminUserRegisterDTO request) {
         UserResponseDTO response = userService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @GetMapping("/reporte-general")
+    public ResponseEntity<GeneralReportResponseDTO> getGeneralReport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        
+        // Puedes inyectar el servicio correspondiente aquí
+        return ResponseEntity.ok(orderService.getGeneralReport(fechaInicio, fechaFin));
     }
 	
 	
