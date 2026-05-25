@@ -1,14 +1,16 @@
 package com.cesde.eventhub.controller;
 
+import java.util.Map; 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.LoginDTO;
-import com.cesde.eventhub.dto.request.RequestTokenRefresh;
 import com.cesde.eventhub.dto.request.UserRegisterDTO;
 import com.cesde.eventhub.dto.response.ResponseLoginDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
@@ -16,7 +18,10 @@ import com.cesde.eventhub.entity.RefreshToken;
 import com.cesde.eventhub.service.JwtService;
 import com.cesde.eventhub.service.RefreshTokenService;
 import com.cesde.eventhub.service.UserService;
+import com.cesde.eventhub.utils.*;
 
+
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -47,7 +52,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@Valid @RequestBody LoginDTO login) {
+	public ResponseEntity<ResponseLoginDTO> login(@Valid @RequestBody LoginDTO login,  HttpServletResponse response) {
 
 			UserResponseDTO user = userService.iniciarSesion(login);
 
@@ -57,21 +62,29 @@ public class AuthController {
 			user.getRoles());
 
 			RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+			
+			
+			CreateCookie.setRefreshTokenCookie(response, refreshToken.getToken());
 
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(new ResponseLoginDTO(refreshToken.getToken(), accessToken));
+					.body(new ResponseLoginDTO(accessToken));
 
 	}
 
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<?> refreshToken(@Valid @RequestBody RequestTokenRefresh token) {
-		try {
-			ResponseLoginDTO newTokens = refreshTokenService.renovateAccessToken(token.getTokenRefresh());
+    public ResponseEntity<ResponseLoginDTO> refresh(
+            @CookieValue(name = "refresh_token", required = false) String refreshToken, 
+            HttpServletResponse response
+    ) {
+     
+        Map<String, String> tokens = refreshTokenService.renovateAccessToken(refreshToken);
 
-			return ResponseEntity.status(HttpStatus.OK).body(newTokens);
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-		}
-	}
+        String newAccess = tokens.get("access_token");
+        String newRefresh = tokens.get("refresh_token");
 
+        CreateCookie.setRefreshTokenCookie(response, newRefresh);
+
+        return ResponseEntity.ok(new ResponseLoginDTO(newAccess));
+    }
 }
+
