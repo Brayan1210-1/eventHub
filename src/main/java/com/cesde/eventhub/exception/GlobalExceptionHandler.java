@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 				ex.getMessage(),
 				LocalDateTime.now()
 				);
-		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
 	

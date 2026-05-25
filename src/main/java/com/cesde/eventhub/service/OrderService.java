@@ -20,11 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
+import com.cesde.eventhub.dto.response.CategoryReportDTO;
+import com.cesde.eventhub.dto.response.GeneralReportResponseDTO;
 import com.cesde.eventhub.dto.response.MyOrderDTO;
 import com.cesde.eventhub.dto.response.MyTicketDTO;
 import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
+import com.cesde.eventhub.dto.response.TopEventDTO;
 import com.cesde.eventhub.entity.Client;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
@@ -38,6 +41,7 @@ import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.exception.custom.Unauthorized;
 import com.cesde.eventhub.mapper.OrderMapper;
+import com.cesde.eventhub.mapper.ReportMapper;
 import com.cesde.eventhub.repository.ClientRepository;
 import com.cesde.eventhub.repository.OrderRepository;
 import com.cesde.eventhub.repository.TicketPriceRepository;
@@ -60,6 +64,7 @@ public class OrderService {
     private final EventService eventService;
     private final ClientService clientService;
     private final ClientRepository clientRepository;
+    private final ReportMapper reportMapper;
 
     
     @PreAuthorize("hasRole('CLIENTE')")
@@ -294,6 +299,32 @@ public class OrderService {
                 organizerId, eventId, status, startDate, endDate, pageable);
 
         return PaginationUtils.toPaginatedResponse(orderPage, orderMapper::toHistoryDTO);
+    }
+    
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public GeneralReportResponseDTO getGeneralReport(LocalDate startDate, LocalDate endDate) {
+    	
+    	if (startDate.isAfter(endDate)) {
+            
+            throw new InvalidRegistration("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        }
+        
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+
+        long totalOrders = orderRepository.countByStatusAndCreatedAtBetween(OrderStatus.PAGADA, start, end);
+        long totalTickets = ticketRepository.countTicketsSoldInPeriod(start, end);
+        Double rawRevenue = ticketRepository.sumRevenueInPeriod(start, end);
+        double totalRevenue = rawRevenue != null ? rawRevenue : 0.0;
+
+        List<CategoryReportDTO> categories = reportMapper.toCategoryDTOList(
+                ticketRepository.getCategorySalesInPeriod(start, end));
+
+        List<TopEventDTO> topEvents = reportMapper.toTopEventDTOList(
+                ticketRepository.getTopEventsInPeriod(start, end, PageRequest.of(0, 5)));
+
+        return reportMapper.toGeneralReportDTO(totalOrders, totalTickets, totalRevenue, categories, topEvents);
     }
     
     @Scheduled(fixedRate = 60000)
