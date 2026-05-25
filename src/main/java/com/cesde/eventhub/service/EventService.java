@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,10 @@ import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.FilterEventsPublicsDTO;
 import com.cesde.eventhub.dto.response.EventDetailPublicDTO;
 import com.cesde.eventhub.dto.response.EventPublicDTO;
+import com.cesde.eventhub.dto.response.EventReportResponseDTO;
 import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
+import com.cesde.eventhub.dto.response.ZoneReportDTO;
 import com.cesde.eventhub.entity.Event;
 import com.cesde.eventhub.entity.Order;
 import com.cesde.eventhub.entity.User;
@@ -26,11 +29,15 @@ import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.enums.TicketStatus;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
+import com.cesde.eventhub.exception.custom.Unauthorized;
 import com.cesde.eventhub.mapper.EventMapper;
+import com.cesde.eventhub.projections.ZoneStatsProjection;
 import com.cesde.eventhub.repository.EventRepository;
 import com.cesde.eventhub.repository.OrderRepository;
+import com.cesde.eventhub.repository.TicketRepository;
 import com.cesde.eventhub.utils.PaginationUtils;
 import com.cesde.eventhub.entity.Place;
+import com.cesde.eventhub.entity.TicketPrice;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +51,7 @@ public class EventService {
     private final PlaceService placeService;
     private final UserService userService;
     private final EventMapper eventMapper;
+    private final TicketRepository ticketRepository;
     
     
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
@@ -160,7 +168,7 @@ public class EventService {
         }
 
         if (end != null && end.isBefore(start)) {
-            // Caso: La fecha final es antes que la inicial (Error de lógica)
+          
             throw new InvalidRegistration("La fecha de fin no puede ser anterior a la de inicio.");
         }
     	
@@ -173,6 +181,64 @@ public class EventService {
         );
 
         return PaginationUtils.toPaginatedResponse(eventsPage, eventMapper::toPublicDTO);
+    }
+    
+    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    @Transactional(readOnly = true)
+    public EventReportResponseDTO getEventReport(Long eventId) {
+        
+        Event event = findEventById(eventId);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            UUID authenticatedUserId = UUID.fromString(auth.getName());
+            if (event.getOrganizer() == null || !event.getOrganizer().getId().equals(authenticatedUserId)) {
+                throw new Unauthorized("Acceso denegado: No tienes permisos sobre las estadísticas de este evento.");
+            }
+        }
+
+        long totalSold = ticketRepository.countByOrder_EventIdAndOrder_Status(eventId, OrderStatus.PAGADA);
+        Double rawRevenue = ticketRepository.sumRevenueByEventId(eventId);
+        double totalRevenue = rawRevenue != null ? rawRevenue : 0.0;
+
+        long totalRemaining = event.getTicketPrices().stream()
+                .mapToLong(TicketPrice::getAvailableQuantity) 
+                .sum();
+
+        List<ZoneStatsProjection> dbZoneStats = ticketRepository.getZoneStatsByEventId(eventId);
+
+        List<ZoneReportDTO> zoneReports = event.getTicketPrices().stream().map(tp -> {
+            String zoneName = tp.getZone().getName();
+
+            ZoneStatsProjection stats = dbZoneStats.stream()
+                    .filter(s -> s.getZoneName().equals(zoneName))
+                    .findFirst()
+                    .orElse(null);
+
+            long sold = stats != null ? stats.getTicketsSold() : 0L;
+            double revenue = stats != null ? stats.getRevenue() : 0.0;
+            
+            long remaining = tp.getAvailableQuantity(); 
+
+            return new ZoneReportDTO(zoneName, sold, remaining, revenue);
+        }).toList();
+
+        Long totalAttendees = null;
+        if (event.getEventDate().isBefore(LocalDate.now())) {
+            totalAttendees = ticketRepository.countByOrder_EventIdAndStatus(eventId, TicketStatus.USADA);
+        }
+
+        return eventMapper.toReportDTO(
+                event, 
+                totalSold, 
+                totalRemaining, 
+                totalRevenue, 
+                totalAttendees, 
+                zoneReports
+        );
     }
     
     @Transactional(readOnly = true)
