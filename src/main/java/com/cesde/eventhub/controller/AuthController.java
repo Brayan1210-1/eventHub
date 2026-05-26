@@ -40,14 +40,16 @@ public class AuthController {
 	private final RefreshTokenService refreshTokenService;
 
 	@PostMapping("/registro")
-	public ResponseEntity<?> createUser(@Valid @RequestBody UserRegisterDTO user) {
+	public ResponseEntity<ResponseLoginDTO> createUser(@Valid @RequestBody UserRegisterDTO user) {
 		
 			UserResponseDTO userCreate = userService.createClient(user);
 
 			String token = jwtService.generateAccessToken(userCreate.getId(), userCreate.getEmail(),
 					userCreate.getRoles());
+			
+			ResponseLoginDTO response = new ResponseLoginDTO(token); 
 
-			return ResponseEntity.status(HttpStatus.CREATED).body(token);
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
 	}
 
