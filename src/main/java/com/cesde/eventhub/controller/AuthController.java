@@ -72,6 +72,20 @@ public class AuthController {
 					.body(new ResponseLoginDTO(accessToken));
 
 	}
+	
+	@PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(
+            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response) {
+        
+        refreshTokenService.logout(refreshToken);
+        
+        
+       CreateCookie.deleteRefreshTokenCookie(response);
+        
+      
+        return ResponseEntity.ok(Map.of("message", "Sesión cerrada correctamente"));
+    }
 
 	@PostMapping("/refreshtoken")
     public ResponseEntity<ResponseLoginDTO> refresh(

@@ -14,4 +14,14 @@ public class CreateCookie {
         
         response.addCookie(cookie);
     }
+	
+	public static void deleteRefreshTokenCookie(HttpServletResponse response) {
+		Cookie cookie = new Cookie("refresh_token", null);
+		cookie.setHttpOnly(true);
+		cookie.setSecure(false);
+		cookie.setPath("/");
+		cookie.setMaxAge(0);
+		
+		response.addCookie(cookie);
+	}
 }
