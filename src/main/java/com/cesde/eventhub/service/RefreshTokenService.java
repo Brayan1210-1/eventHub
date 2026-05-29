@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,22 @@ public class RefreshTokenService {
 	            );
 
 	            return refreshTokenRepository.save(refreshToken);
+	        }
+	        
+	        @Transactional
+	        public void logout(String refreshToken) {
+	            if (refreshToken != null && !refreshToken.isBlank()) {
+	               
+	                refreshTokenRepository.deleteByToken(refreshToken); 
+	            }
+	        }
+	        
+	        @Scheduled(fixedRate = 3600000)
+	        @Transactional
+	        public void cleanExpiredTokens() {
+	            System.out.println("Iniciando limpieza de Refresh Tokens expirados...");
+	            refreshTokenRepository.deleteByexpirationDate();
+	            System.out.println("Limpieza completada.");
 	        }
 	        
 	        @Transactional
