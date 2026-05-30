@@ -12,6 +12,7 @@ public class PlaceResponseDTO {
     private String address;
     private String city;
     private Integer totalCapacity;
+    private String description;
     private String imageUrl;
     private boolean active;
 }

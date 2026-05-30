@@ -27,13 +27,16 @@ public class UpdatePlaceDTO {
 		
 		@NotNull
 		@Min(value = 1, message = "La capacidad debe ser positiva")
-		private Integer total_capacity;
+		private Integer totalCapacity;
 		
 		private String description;
 		
+		@NotBlank(message = "Debe ingresar una url")
 		private String imageUrl;
 		
+		/*
+		 * Para mí, solo se debería modificar este estado con el endpoint de "eliminar"
 		@NotNull(message = "Debe haber un estado")
 		private Boolean active;
-
+          */
 }

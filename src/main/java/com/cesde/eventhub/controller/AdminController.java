@@ -1,18 +1,19 @@
 package com.cesde.eventhub.controller;
 
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cesde.eventhub.dto.MessageDTO;
 import com.cesde.eventhub.dto.PlaceDTO;
 import com.cesde.eventhub.dto.request.AdminUserRegisterDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
@@ -43,9 +44,8 @@ public class AdminController {
 	private final OrderService orderService;
  
 	@PostMapping("/crearlugar")
-	public ResponseEntity<?> createPlace(@Valid @RequestBody PlaceDTO place){
+	public ResponseEntity<PlaceDTO> createPlace(@Valid @RequestBody PlaceDTO place){
 	
-		
 		return ResponseEntity.status(HttpStatus.OK).body(placeService.createPlace(place));
 	}
 	
@@ -55,8 +55,8 @@ public class AdminController {
 		return ResponseEntity.ok(placeService.activesPlaces(pageable));
 	}
 	
-	@PutMapping("/actualizarlugar/{id}")
-	public ResponseEntity<?> updatePlace(
+	@PatchMapping("/actualizarlugar/{id}")
+	public ResponseEntity<UpdatePlaceDTO> updatePlace(
 	        @PathVariable Long id,
 	        @RequestBody @Valid UpdatePlaceDTO placeDTO) {
 		
@@ -64,11 +64,11 @@ public class AdminController {
 	 }
 	
 	@DeleteMapping("eliminar/{id}")
-    public ResponseEntity<?> deletePlace(@PathVariable Long id){
+    public ResponseEntity<MessageDTO> deletePlace(@PathVariable Long id){
 		
 			placeService.deletePlace(id);
-			  return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Eliminado correctamente");
-  			  
+			MessageDTO message = new MessageDTO("Lugar eliminado correctamente");
+			  return ResponseEntity.status(HttpStatus.NO_CONTENT).body(message);
     }
 	
 	
@@ -83,7 +83,6 @@ public class AdminController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
         
-        // Puedes inyectar el servicio correspondiente aquí
         return ResponseEntity.ok(orderService.getGeneralReport(fechaInicio, fechaFin));
     }
 	
