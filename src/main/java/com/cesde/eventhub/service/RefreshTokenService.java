@@ -1,16 +1,20 @@
 package com.cesde.eventhub.service;
 
-import java.time.Instant;
+import java.time.Instant; 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
-import com.cesde.eventhub.dto.response.ResponseLoginDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.entity.RefreshToken;
 import com.cesde.eventhub.entity.User;
+import com.cesde.eventhub.exception.custom.Unauthorized;
 import com.cesde.eventhub.mapper.UserMapper;
 import com.cesde.eventhub.repository.RefreshTokenRepository;
 
@@ -34,7 +38,7 @@ public class RefreshTokenService {
 	        	
 	        	User userEntity = userService.findByEmail(user.getEmail());
 
-	            // Generate refresh token with JwtService
+	            
 	            String refreshTokenJwt = jwtService.generateRefreshToken(user.getId());
 
 	            RefreshToken refreshToken = new RefreshToken();
@@ -45,6 +49,22 @@ public class RefreshTokenService {
 	            );
 
 	            return refreshTokenRepository.save(refreshToken);
+	        }
+	        
+	        @Transactional
+	        public void logout(String refreshToken) {
+	            if (refreshToken != null && !refreshToken.isBlank()) {
+	               
+	                refreshTokenRepository.deleteByToken(refreshToken); 
+	            }
+	        }
+	        
+	        @Scheduled(fixedRate = 3600000)
+	        @Transactional
+	        public void cleanExpiredTokens() {
+	            System.out.println("Iniciando limpieza de Refresh Tokens expirados...");
+	            refreshTokenRepository.deleteByexpirationDate();
+	            System.out.println("Limpieza completada.");
 	        }
 	        
 	        @Transactional
@@ -60,14 +80,17 @@ public class RefreshTokenService {
 		        return newRefreshToken;
 		    }
 	        
+	        
 	        private RefreshToken validateRefreshToken(String refreshToken) {
 
+	        	
+	        	
 		        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
-		                .orElseThrow(() -> new RuntimeException("Token inválido"));
+		                .orElseThrow(() -> new Unauthorized("Token inválido"));
 
 		        if (token.isExpired()) {
 		            refreshTokenRepository.deleteByexpirationDate();;
-		            throw new RuntimeException("Token expirado");
+		            throw new Unauthorized("Token expirado");
 		        }
 
 		        return token;
@@ -75,7 +98,7 @@ public class RefreshTokenService {
 
 
          @Transactional
-	    public ResponseLoginDTO renovateAccessToken(String refreshToken) {
+	    public Map<String, String> renovateAccessToken(String refreshToken) {
 	    	
 	       RefreshToken validToken = validateRefreshToken(refreshToken);
 
@@ -92,8 +115,12 @@ public class RefreshTokenService {
 	                				userDTO.getRoles()
 	                				); 
 	        
-	        return new ResponseLoginDTO(newRefresh.getToken(), newAccess);
-	        
+	       
+	Map<String, String> tokens = new HashMap<>();
+    tokens.put("access_token", newAccess);
+    tokens.put("refresh_token", newRefresh.getToken());
+    
+    return tokens;
 	    }
 	    
 	    

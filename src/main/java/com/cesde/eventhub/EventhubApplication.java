@@ -73,7 +73,7 @@ public class EventhubApplication {
 	            System.out.println("El admin hace aparición");
 	            
 	        	}
-	        	
+	        	/*
 	          	String emailOrganizador = "organizador@gmail.com";
 	          	
 	        	if(userRepository.findByEmail(emailOrganizador).isEmpty()) {
@@ -93,7 +93,7 @@ public class EventhubApplication {
 		            System.out.println("El organizador hace aparición");
 		            
 		        	}
-	        	
+	        	*/
 	        	
 	        };
 	 }
