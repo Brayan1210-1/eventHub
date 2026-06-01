@@ -25,7 +25,4 @@ public class ZoneRegisterDTO {
 	@NotBlank(message = "La decripcion es obligatoria")
 	private String description;
 	
-	@NotNull(message = "El id del lugar es obligatorio")
-	private Long placeId;
-
 }
