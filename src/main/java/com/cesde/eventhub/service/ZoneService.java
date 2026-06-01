@@ -31,9 +31,9 @@ public class ZoneService {
 	
 	@Transactional
 	@PreAuthorize("hasRole('ADMIN')")
-	public ZoneResponseDTO createZone(ZoneRegisterDTO zone) {
+	public ZoneResponseDTO createZone(ZoneRegisterDTO zone, Long placeId) {
 		
-		Place place = placeService.validatePlaceIsActiveAndExists(zone.getPlaceId());
+		Place place = placeService.validatePlaceIsActiveAndExists(placeId);
 		
 		validateCapacity(place, zone.getCapacity(), 0);
 		
@@ -47,10 +47,10 @@ public class ZoneService {
 	
 	@Transactional
 	@PreAuthorize("hasRole('ADMIN')")
-	public ZoneResponseDTO updateZone(Long id, ZoneRegisterDTO updateZone) {
+	public ZoneResponseDTO updateZone(Long placeId, Long zoneId, ZoneRegisterDTO updateZone) {
 		
-		Zone zoneFound = findById(id);
-		Place place = placeService.validatePlaceIsActiveAndExists(updateZone.getPlaceId());
+		Zone zoneFound = findById(zoneId);
+		Place place = placeService.validatePlaceIsActiveAndExists(placeId);
 		
 		validateCapacity(place, updateZone.getCapacity(), zoneFound.getCapacity());
 		

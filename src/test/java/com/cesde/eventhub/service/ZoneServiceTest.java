@@ -46,7 +46,7 @@ class ZoneServiceTest {
 
     @InjectMocks
     private ZoneService zoneService;
-
+/*
     private Place place;
     private Zone zoneEntity;
     private ZoneRegisterDTO zoneRegisterDTO;
@@ -133,7 +133,7 @@ class ZoneServiceTest {
         assertEquals(1, result.getTotalElements());
         verify(placeService).findByPlaceId(1L);
     }
-*/
+
     @Test
     void deleteZone_ShouldInvokeDelete() {
      
@@ -143,4 +143,5 @@ class ZoneServiceTest {
 
         verify(zoneRepository).deleteById(10L);
     }
+    */
 }

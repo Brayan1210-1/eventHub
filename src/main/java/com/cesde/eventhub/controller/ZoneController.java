@@ -29,34 +29,37 @@ public class ZoneController {
 	private final ZoneService zoneService;
 	
 	
-	@PostMapping("/crear")
-	public ResponseEntity<ZoneResponseDTO> createZone(@Valid @RequestBody ZoneRegisterDTO zoneRequest){
+	@PostMapping("/lugar/{lugarId}/crear")
+	public ResponseEntity<ZoneResponseDTO> createZone(@PathVariable Long lugarId,  @Valid @RequestBody ZoneRegisterDTO zoneRequest){
 		
-		ZoneResponseDTO zoneResponse = zoneService.createZone(zoneRequest);
+		ZoneResponseDTO zoneResponse = zoneService.createZone(zoneRequest, lugarId);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(zoneResponse);
 	}
 	
-	@PutMapping("/actualizar/{id}")
-	public ResponseEntity<ZoneResponseDTO> updateZone (@PathVariable Long id,@Valid @RequestBody ZoneRegisterDTO zoneUpdate){
+	@PutMapping("/lugar/{lugarId}/actualizar/{zonaId}")
+	public ResponseEntity<ZoneResponseDTO> updateZone (
+			@PathVariable Long lugarId,
+			@PathVariable Long zonaId,
+			@Valid @RequestBody ZoneRegisterDTO zoneUpdate){
 		
-		ZoneResponseDTO zoneResponse = zoneService.updateZone(id, zoneUpdate);
+		ZoneResponseDTO zoneResponse = zoneService.updateZone(lugarId,zonaId, zoneUpdate);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(zoneResponse);
 		
 	}
 	
-	@GetMapping("/lugar/{id}")
+	@GetMapping("/lugar/{lugarId}")
     public ResponseEntity<PaginatedResponseDTO<ZoneResponseDTO>> getByPlace(
-            @PathVariable Long id,
+            @PathVariable Long lugarId,
             @PageableDefault(size = 10, page = 0) Pageable pageable) {
         
-        return ResponseEntity.status(HttpStatus.OK).body(zoneService.getZonesByPlace(id, pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(zoneService.getZonesByPlace(lugarId, pageable));
     }
 	
-	@DeleteMapping("/eliminar/{id}")
-	public ResponseEntity<Void> deleteZone(@PathVariable Long id) {
-	    zoneService.deleteZone(id);
+	@DeleteMapping("/eliminar/{zoneId}")
+	public ResponseEntity<Void> deleteZone(@PathVariable Long zoneId) {
+	    zoneService.deleteZone(zoneId);
 	    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	
