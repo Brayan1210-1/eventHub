@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "cors.url",
+  "type": "java.lang.String",
+  "description": "Es la url del frontend, sirve para habilitarla en el cors para permitir peticiones"
+}]}

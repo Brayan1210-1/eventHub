@@ -18,7 +18,7 @@ public class CreateCookie {
 	public static void deleteRefreshTokenCookie(HttpServletResponse response) {
 		Cookie cookie = new Cookie("refresh_token", null);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(false);
+		cookie.setSecure(true);
 		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		

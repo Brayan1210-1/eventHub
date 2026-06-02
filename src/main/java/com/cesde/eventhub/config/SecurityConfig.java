@@ -3,6 +3,7 @@ package com.cesde.eventhub.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtFilter;
+	
+	@Value("${cors.url}")
+	String urlFront;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -86,7 +90,8 @@ public class SecurityConfig {
 	    CorsConfigurationSource corsConfigurationSource() {
 	        CorsConfiguration configuration = new CorsConfiguration();
 	       
-	        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8081"));
+	        configuration.setAllowedOrigins(Arrays.asList("", 
+	        		"", urlFront));
 	        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 	        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 	        configuration.setAllowCredentials(true); 
