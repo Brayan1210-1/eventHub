@@ -74,8 +74,6 @@ class TicketPriceServiceTest {
 
    
         registerDTO = new TicketPriceRegisterDTO();
-        registerDTO.setEventId(1L);
-        registerDTO.setZoneId(20L);
         registerDTO.setAvailableQuantity(50); // Menor que la capacidad (100)
         registerDTO.setPrice(150.0);
 
@@ -92,7 +90,7 @@ class TicketPriceServiceTest {
         when(zoneService.findById(20L)).thenReturn(zone);
         when(ticketPriceRepository.save(any(TicketPrice.class))).thenReturn(ticketPriceEntity);
  
-        TicketPriceResponseDTO result = ticketPriceService.createTicketPrice(registerDTO);
+        TicketPriceResponseDTO result = ticketPriceService.createTicketPrice(event.getId(),zone.getId(),registerDTO);
 
         assertNotNull(result);
         verify(userService).validateAuthority(organizer.getId());
