@@ -33,15 +33,17 @@ public class TicketPriceService {
 	
 	@Transactional
 	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
-	public TicketPriceResponseDTO createTicketPrice(TicketPriceRegisterDTO ticket) {
+	public TicketPriceResponseDTO createTicketPrice(Long eventId,
+			Long zoneId,
+			TicketPriceRegisterDTO ticket) {
 	  
-	    Event event = eventService.findEventById(ticket.getEventId());
+	    Event event = eventService.findEventById(eventId);
 	    
 	    UUID onwerEventId = event.getOrganizer().getId();
 	    
 	    userService.validateAuthority(onwerEventId);
 	    
-	    Zone zone = zoneService.findById(ticket.getZoneId());
+	    Zone zone = zoneService.findById(zoneId);
 	    
 	    placeService.validatePlaceIsActiveAndExists(zone.getPlace().getId()); 
 	    

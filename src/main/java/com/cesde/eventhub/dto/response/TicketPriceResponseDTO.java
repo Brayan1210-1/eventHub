@@ -12,6 +12,7 @@ import lombok.Setter;
 public class TicketPriceResponseDTO {
     private Long id;
     private Long eventId;
+    private Long zoneId;
     private String eventName;
     private String zoneName;
     private String organizerEmail;

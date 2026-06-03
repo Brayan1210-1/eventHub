@@ -16,6 +16,7 @@ unmappedTargetPolicy = ReportingPolicy.IGNORE)
 	    @Mapping(source = "event.name", target = "eventName")
 	    @Mapping(source = "zone.name", target = "zoneName")
 	    @Mapping(source = "zone.capacity", target = "zoneMaxCapacity")
+	    @Mapping(source = "zone.id", target = "zoneId")
 	    @Mapping(source = "event.organizer.email", target = "organizerEmail")
 	    TicketPriceResponseDTO toDTO(TicketPrice ticketPrice);
 

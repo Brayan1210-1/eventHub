@@ -19,20 +19,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/tickets-precios")
+@RequestMapping("/api/v1/precios")
 @RequiredArgsConstructor
 public class TicketPriceController {
 
     private final TicketPriceService ticketPriceService;
 
-    @PostMapping("/crear")
-    public ResponseEntity<TicketPriceResponseDTO> create(@Valid @RequestBody TicketPriceRegisterDTO dto) {
-        return new ResponseEntity<>(ticketPriceService.createTicketPrice(dto), HttpStatus.CREATED);
+    @PostMapping("/evento/{eventId}/zona/{zoneId}/crear")
+    public ResponseEntity<TicketPriceResponseDTO> create(
+    		@Valid @RequestBody TicketPriceRegisterDTO dto,
+    		@PathVariable Long eventId,
+    		@PathVariable Long zoneId) {
+        return new ResponseEntity<>(ticketPriceService.createTicketPrice(eventId,zoneId,dto), HttpStatus.CREATED);
     }
     
-    @GetMapping("/evento/{zoneId}")
-    public ResponseEntity<List<TicketPriceResponseDTO>> getPricesByEvent(@PathVariable Long zoneId) {
-        List<TicketPriceResponseDTO> prices = ticketPriceService.getPricesByEvent(zoneId);
+    @GetMapping("/evento/{eventId}/precios")
+    public ResponseEntity<List<TicketPriceResponseDTO>> getPricesByEvent(@PathVariable Long eventId) {
+        List<TicketPriceResponseDTO> prices = ticketPriceService.getPricesByEvent(eventId);
         return ResponseEntity.ok(prices);
     }
 }
