@@ -1,14 +1,18 @@
 package com.cesde.eventhub.service;
 
 
-import org.springframework.data.domain.Page; 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.PlaceDTO;
+import com.cesde.eventhub.dto.PlaceDetailDTO;
+import com.cesde.eventhub.dto.PlaceListDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
@@ -16,6 +20,7 @@ import com.cesde.eventhub.entity.Place;
 import com.cesde.eventhub.exception.custom.DataNotFound;
 import com.cesde.eventhub.exception.custom.InvalidRegistration;
 import com.cesde.eventhub.mapper.PlaceMapper;
+import com.cesde.eventhub.projections.PlaceBasicProjection;
 import com.cesde.eventhub.repository.PlaceRepository;
 import com.cesde.eventhub.utils.PaginationUtils;
 
@@ -70,6 +75,25 @@ public class PlaceService {
 		Place deletedPlace = findByPlaceId(id);
 		placeRepository.delete(deletedPlace);
 		
+	}
+	
+	@Transactional(readOnly = true)
+	@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    public PaginatedResponseDTO<PlaceListDTO> getBasicPlacesList(String name, int page, int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PlaceBasicProjection> projectionsPage = placeRepository.findActiveBasicPlacesWithFilters(name, pageable);
+
+        return PaginationUtils.toPaginatedResponse(projectionsPage, placeMapper::toListDTO);
+    }
+	
+	@Transactional(readOnly = true)
+    public PlaceDetailDTO getPlaceDetails(Long id) {
+        
+        Place place = findByPlaceId(id);
+
+        return placeMapper.toDetailDTO(place);
 	}
 	
 	public Place findByPlaceId(Long id) {

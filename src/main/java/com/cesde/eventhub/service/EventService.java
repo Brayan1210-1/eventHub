@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -62,11 +63,43 @@ public class EventService {
        return PaginationUtils.toPaginatedResponse(events, eventMapper::toDTO);
     }
     
-    
+	@Transactional(readOnly = true)
+	 @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
+    public PaginatedResponseDTO<EventResponseDTO> getMyEvents(
+            UUID organizerId, 
+            EventStatus status, 
+            int page, 
+            int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Event> eventsPage = eventRepository.findMyEventsWithFilters(organizerId, status, pageable);
+
+        return PaginationUtils.toPaginatedResponse(eventsPage, eventMapper::toDTO);
+    }
+	
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZADOR')")
     public EventResponseDTO createEvent(EventRegisterDTO dto) {
-        
+    	
+   
+    	if(dto.getSalesEndDate().toLocalDate().isAfter(dto.getEventDate())){
+    		throw new InvalidRegistration("La fecha de fin de ventas no puede ser posterior al evento");
+    	}
+    	
+    	if(dto.getOpeningTime().isAfter(dto.getStartTime())) {
+    		throw new InvalidRegistration("El inicio del evento debe ser posterior a la apertura");
+    	}
+    	
+    if(dto.getSalesStartDate().toLocalDate().isAfter(dto.getEventDate())) {
+    	        throw new InvalidRegistration("Inicio de ventas no puede ser posterior a la fecha del evento");
+    }
+    	
+    	if (dto.getSalesEndDate().isBefore(dto.getSalesStartDate())) {
+            throw new InvalidRegistration("La fecha de fin de ventas no puede ser anterior a la fecha de inicio.");
+        }
+    	
+    	
         Place place = placeService.validatePlaceIsActiveAndExists(dto.getPlaceId());
        
         boolean isOccupied = eventRepository.existsByPlaceIdAndEventDateAndStatusNot(

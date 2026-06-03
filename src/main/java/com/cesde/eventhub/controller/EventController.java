@@ -1,6 +1,7 @@
 package com.cesde.eventhub.controller;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -8,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +27,7 @@ import com.cesde.eventhub.dto.response.EventResponseDTO;
 import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.TicketValidationResponseDTO;
+import com.cesde.eventhub.enums.EventStatus;
 import com.cesde.eventhub.enums.OrderStatus;
 import com.cesde.eventhub.service.EventService;
 import com.cesde.eventhub.service.OrderService;
@@ -53,6 +56,18 @@ public class EventController {
     public ResponseEntity<String> publishEvent(@PathVariable Long eventId) {
         eventService.publishEvent(eventId);
         return ResponseEntity.ok("El evento ha sido publicado exitosamente.");
+    }
+    
+    @GetMapping("/mis-eventos")
+    public ResponseEntity<PaginatedResponseDTO<EventResponseDTO>> getMyEvents(
+            @RequestParam(required = false) EventStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        
+        UUID userId = UUID.fromString(authentication.getName()); 
+        
+        return ResponseEntity.ok(eventService.getMyEvents(userId, status, page, size));
     }
     
     @GetMapping("/todos")

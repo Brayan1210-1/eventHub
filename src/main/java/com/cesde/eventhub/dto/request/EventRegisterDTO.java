@@ -1,6 +1,6 @@
 package com.cesde.eventhub.dto.request;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Getter
 @Setter
@@ -37,12 +38,15 @@ public class EventRegisterDTO {
     private Category category;
     private String imageUrl;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(example = "2026-06-04T08:28")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime salesStartDate;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+
+    @Schema(example = "2026-06-04T08:28")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime salesEndDate;
 
+    
     @NotNull(message = "Place ID is required")
     private Long placeId;
 }

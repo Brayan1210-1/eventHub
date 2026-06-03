@@ -6,9 +6,12 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 import com.cesde.eventhub.dto.PlaceDTO;
+import com.cesde.eventhub.dto.PlaceDetailDTO;
+import com.cesde.eventhub.dto.PlaceListDTO;
 import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
 import com.cesde.eventhub.entity.Place;
+import com.cesde.eventhub.projections.PlaceBasicProjection;
 
 
 @Mapper(componentModel = "spring",
@@ -37,6 +40,10 @@ public interface PlaceMapper {
 	
 	PlaceResponseDTO toPage(Place place);
 	
+	PlaceListDTO toListDTO(PlaceBasicProjection projection);
+	
+	@Mapping(target = "totalCapacityZones", expression = "java(place.getZones() != null ? place.getZones().stream().mapToInt(z -> z.getCapacity()).sum() : 0)")
+    PlaceDetailDTO toDetailDTO(Place place);
 	
     
 	
