@@ -35,9 +35,11 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/comprar")
-    public ResponseEntity<OrderResponseDTO> purchaseTickets(@Valid @RequestBody PurchaseRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(request));
+    @PostMapping("/evento/{eventId}/zona/{zoneId}")
+    public ResponseEntity<OrderResponseDTO> purchaseTickets(@Valid @RequestBody PurchaseRequestDTO request,
+    		@PathVariable Long eventId,
+    		@PathVariable Long zoneId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(eventId,zoneId,request));
     }
     
     @PostMapping("/{id}/confirmar-pago")

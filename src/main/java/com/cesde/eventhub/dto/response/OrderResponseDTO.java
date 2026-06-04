@@ -19,6 +19,6 @@ public class OrderResponseDTO {
     private String status;
     private Double totalAmount;
     
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime expirationTime; 
 }
