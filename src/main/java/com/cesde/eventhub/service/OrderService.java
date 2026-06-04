@@ -69,13 +69,13 @@ public class OrderService {
     
     @PreAuthorize("hasRole('CLIENTE')")
     @Transactional
-    public OrderResponseDTO createOrder(PurchaseRequestDTO request) {
+    public OrderResponseDTO createOrder(Long eventId, Long zoneId, PurchaseRequestDTO request) {
     	String user = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID userId = UUID.fromString(user);
         
         Client client = clientService.findByUserId(userId);
                
-        TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneIdWithLock(request.getEventId(), request.getZoneId())
+        TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneIdWithLock(eventId, zoneId)
                 .orElseThrow(() -> new DataNotFound("Zona o evento no disponible"));
 
         Event event = ticketPrice.getEvent();

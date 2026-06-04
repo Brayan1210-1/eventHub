@@ -35,8 +35,8 @@ public class PublicController {
         return ResponseEntity.ok(eventService.getPublicEvents(filters, pageable));
     }
     
-    @GetMapping("/detalle/{id}")
-    public ResponseEntity<EventDetailPublicDTO> getEventDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.getEventDetail(id));
+    @GetMapping("/detalle/evento/{eventId}")
+    public ResponseEntity<EventDetailPublicDTO> getEventDetail(@PathVariable Long eventId) {
+        return ResponseEntity.ok(eventService.getEventDetail(eventId));
     }
 }
