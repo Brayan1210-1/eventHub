@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesde.eventhub.dto.EventCancelDTO;
+import com.cesde.eventhub.dto.MessageDTO;
 import com.cesde.eventhub.dto.request.EventRegisterDTO;
 import com.cesde.eventhub.dto.request.TicketValidationRequestDTO;
 import com.cesde.eventhub.dto.response.EventReportResponseDTO;
@@ -53,9 +54,10 @@ public class EventController {
     }
     
     @PatchMapping("/publicar/{eventId}")
-    public ResponseEntity<String> publishEvent(@PathVariable Long eventId) {
+    public ResponseEntity<MessageDTO> publishEvent(@PathVariable Long eventId) {
         eventService.publishEvent(eventId);
-        return ResponseEntity.ok("El evento ha sido publicado exitosamente.");
+        MessageDTO response = new MessageDTO("El evento ha sido publicado exitosamente.");
+        return ResponseEntity.ok(response);
     }
     
     @GetMapping("/mis-eventos")
@@ -77,14 +79,16 @@ public class EventController {
     }
     
     @PatchMapping("/cancelar/{eventId}")
-    public ResponseEntity<String> cancelEvent(
+    public ResponseEntity<MessageDTO> cancelEvent(
             @PathVariable Long eventId, 
             @Valid @RequestBody EventCancelDTO dto) {
         
         eventService.cancelEvent(eventId, dto);
         
-        return ResponseEntity.ok("El evento ha sido cancelado exitosamente " +
-                "Las órdenes pagadas han sido marcadas para reembolso y las boletas anuladas");
+        MessageDTO response = new MessageDTO(
+    "El evento ha sido cancelado exitosamente."
+    + " Las órdenes pagadas han sido marcadas para reembolso y las boletas anuladas");
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/boletas/validar")
