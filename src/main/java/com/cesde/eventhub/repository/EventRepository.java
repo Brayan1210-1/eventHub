@@ -31,7 +31,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 	@Query("SELECT e FROM Event e " +
 	           "WHERE e.status = 'PUBLICADO' " + 
 	           "AND (cast(:category as string) IS NULL OR e.category = :category) " +
-	           "AND (cast(:city as string) IS NULL OR e.place.city = :city) " +
+	           "AND (cast(:city as string) IS NULL OR LOWER(e.place.city) LIKE LOWER(CONCAT('%', cast(:city as string), '%')))" +
 	           "AND (cast(:startingDate as localdate)  IS NULL OR e.eventDate >= :startingDate) " +
 	           "AND (cast(:endDate as localdate) IS NULL OR e.eventDate <= :endDate)")
 	    Page<Event> filterEventsPublics(
