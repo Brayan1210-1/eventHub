@@ -60,12 +60,14 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping("/venta-fisica")
+    @PostMapping("evento/{eventId}/zona/{zoneId}/venta-fisica")
     public ResponseEntity<OrderResponseDTO> createPhysicalSale(
+    		   @PathVariable Long eventId,
+    		   @PathVariable Long zoneId,
             @Valid @RequestBody PhysicalSaleRequestDTO request) {
         
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.createPhysicalSale(request));
+                .body(orderService.createPhysicalSale(eventId,zoneId,request));
     }
     
     @GetMapping("/pendientes")

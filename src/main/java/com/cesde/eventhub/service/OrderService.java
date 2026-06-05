@@ -202,20 +202,24 @@ public class OrderService {
     
     @PreAuthorize("hasRole('VENDEDOR')")
     @Transactional
-    public OrderResponseDTO createPhysicalSale(PhysicalSaleRequestDTO request) {
+    public OrderResponseDTO createPhysicalSale(Long eventId,Long zoneId,PhysicalSaleRequestDTO request) {
        
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UUID sellerId = UUID.fromString(username);
+      
+        UUID sellerId = userService.getAuthenticatedUserId();
         User seller = userService.findById(sellerId);
                 
-
-        Event event = eventService.findEventById(request.getEventId());
+        Event event = eventService.findEventById(eventId);
                
-        
-        TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneId(request.getEventId(), request.getZoneId())
+        TicketPrice ticketPrice = ticketPriceRepository.findByEventIdAndZoneId(eventId, zoneId)
                 .orElseThrow(() -> new DataNotFound("La zona especificada no está configurada para este evento."));
 
-       
+      if(ticketPrice.getAvailableQuantity() < request.getQuantity()) {
+    	  throw new InvalidRegistration("No hay suficientes boletas disponibles");
+      }
+      
+      ticketPrice.setAvailableQuantity(ticketPrice.getAvailableQuantity() - request.getQuantity());
+      ticketPriceRepository.save(ticketPrice);
+      
         Client client = clientRepository.findByDocument(request.getBuyerDocument())
                 .orElseGet(() -> {
                     Client newClient = new Client();
@@ -223,9 +227,11 @@ public class OrderService {
                     newClient.setName(request.getBuyerName());
                     newClient.setPhone(request.getBuyerPhone());
                     newClient.setLastName(request.getBuyerLastName());
+                    newClient.setContactEmail(request.getBuyerEmail());
                     return clientRepository.save(newClient);
                 });
 
+        
        
         Order order = new Order();
         order.setClient(client);
@@ -238,24 +244,25 @@ public class OrderService {
         order.setExpirationDate(LocalDateTime.now().plusYears(1)); 
         
         Order savedOrder = orderRepository.saveAndFlush(order);
+       
 
         List<Ticket> tickets = IntStream.range(0, request.getQuantity())
                 .mapToObj(i -> {
                     Ticket ticket = new Ticket();
-                    ticket.setOrder(savedOrder);
+                    ticket.setOrder(order);
                     ticket.setTicketPrice(ticketPrice);
                     ticket.setStatus(TicketStatus.ACTIVA); 
                     ticket.setCode(UUID.randomUUID()); 
                     return ticket;
                 }).toList();
+        order.getTickets().addAll(tickets);
         
         ticketRepository.saveAll(tickets);
-
-       
+        savedOrder.getTickets().addAll(tickets);
         
         System.out.println("Vendedor: " + seller.getEmail());
         System.out.println("Comprador: " + client.getName() + " - Doc: " + client.getDocument());
-        System.out.println("Cantidad: " + request.getQuantity() + " boleta(s) en zona ID: " + request.getZoneId());
+        System.out.println("Cantidad: " + request.getQuantity() + " boleta(s) en zona ID: " + zoneId);
         System.out.println("Total Recaudado: $" + order.getTotal());
 
         return orderMapper.toResponseDTO(savedOrder, null); 
@@ -339,13 +346,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'VENDEDOR')")
     public MyOrderDetailDTO getOrderDetails(UUID orderId) {
         UUID userId = userService.getAuthenticatedUserId();
         
-        Client owner = validateOwner(userId, orderId);
+        validateAccess(userId, orderId);
         
-        Order order = orderRepository.findByIdAndClientId(orderId, owner.getId())
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new DataNotFound("La orden no existe o no te pertenece."));
                 
         return orderMapper.toMyOrderDetailDTO(order);
@@ -427,18 +434,24 @@ public class OrderService {
     	return authenticatedClient;
     }
     
-    public Client validateOwner(UUID userId, UUID orderId) {
+    public void validateAccess(UUID userId, UUID orderId) {
+    	Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFound("La orden no existe."));
         
-    	Client authenticatedClient = clientService.findByUserId(userId);
-    	Order order = findById(orderId);
-    	
-    	if (!order.getClient().getId().equals(authenticatedClient.getId())) {
-            throw new Unauthorized("No tienes permiso para acceder, modificar o cancelar esta orden.");
+        // 1. Validar si es el vendedor (usando un chequeo null-safe)
+        if (order.getSeller() != null && order.getSeller().getId().equals(userId)) {
+            return; // ¡Es el vendedor, entrada libre!
         }
-    	
-    	return authenticatedClient;
+
+        // 2. Si no es vendedor, validamos si es el dueño (Cliente)
+        Client authenticatedClient = clientService.findByUserId(userId);
+        if (order.getClient() != null && order.getClient().getId().equals(authenticatedClient.getId())) {
+            return; // ¡Es el cliente, entrada libre!
+        }
+
+        // 3. Si no pasó ninguna, lanzamos error
+        throw new Unauthorized("No tienes permiso para acceder a esta orden.");
     }
-    
     
     
     

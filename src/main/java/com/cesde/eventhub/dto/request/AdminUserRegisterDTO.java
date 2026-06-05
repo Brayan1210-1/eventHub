@@ -23,4 +23,15 @@ public class AdminUserRegisterDTO {
 
     @NotEmpty(message = "Debe especificar al menos un rol para el usuario")
     private Set<UserRoles> roles;
+    
+    @NotBlank(message = "El nombre no puede ser nulo o en blanco")
+	private String name;
+
+	@NotBlank(message = "El apellido es obligatorio")
+	private String lastName;
+
+	@NotBlank(message = "El documento es obligatorio")
+	private String document;
+
+	private String phone;
 }

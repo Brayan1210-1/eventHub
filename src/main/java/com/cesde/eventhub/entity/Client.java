@@ -48,6 +48,10 @@ public class Client {
     @Column(name = "telefono", length = 30, unique = true)
     private String phone;
     
+   //Solo funciona para los clientes que compran en fisico
+    @Column(name = "email_contacto", length = 50)
+    private String contactEmail;
+    
     @Column(name = "created_At", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 

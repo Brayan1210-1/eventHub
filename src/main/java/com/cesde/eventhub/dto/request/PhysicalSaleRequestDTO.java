@@ -14,13 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PhysicalSaleRequestDTO {
 
-    
-    @NotNull(message = "El ID del evento es obligatorio")
-    private Long eventId;
-
-    @NotNull(message = "El ID de la zona es obligatorio")
-    private Long zoneId;
-
     @Min(value = 1, message = "Debe vender al menos 1 boleta")
     private int quantity;
 
@@ -30,9 +23,9 @@ public class PhysicalSaleRequestDTO {
     @NotBlank(message = "El documento es obligatorio")
     private String buyerDocument;
 
-    //@Email(message = "Email inválido")
-    //@NotBlank(message = "El email es obligatorio")
-    //private String buyerEmail;
+    @Email(message = "Email inválido")
+    @NotBlank(message = "El email es obligatorio")
+    private String buyerEmail;
 
     @NotBlank(message = "el apellido es obligatorio")
     private String buyerLastName;
