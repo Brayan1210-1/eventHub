@@ -1,6 +1,7 @@
 package com.cesde.eventhub.controller;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.UUID; 
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cesde.eventhub.dto.MessageDTO;
+import com.cesde.eventhub.dto.MyOrderDetailDTO;
 import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.MyOrderDTO;
-import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.enums.OrderFilter;
@@ -42,19 +44,20 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(eventId,zoneId,request));
     }
     
-    @PostMapping("/{id}/confirmar-pago")
+    @PostMapping("/{orderId}/confirmar-pago")
     public ResponseEntity<OrderResponseDTO> confirmPayment(
-            @PathVariable UUID id, 
+            @PathVariable UUID orderId, 
             @Valid @RequestBody ConfirmPay request) {
         
-        return ResponseEntity.ok(orderService.confirmPayment(id, request));
+        return ResponseEntity.ok(orderService.confirmPayment(orderId, request));
     }
     
-    @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<OrderResponseDTO> cancelOrder(
-            @PathVariable UUID id) {
-        
-        return ResponseEntity.ok(orderService.cancelOrder(id));
+    @PatchMapping("/{orderId}/cancelar")
+    public ResponseEntity<MessageDTO> cancelOrder(
+            @PathVariable UUID orderId) {
+      	MessageDTO response = orderService.cancelOrder(orderId);
+  
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/venta-fisica")
@@ -65,8 +68,19 @@ public class OrderController {
                 .body(orderService.createPhysicalSale(request));
     }
     
+    @GetMapping("/pendientes")
+   
+    public ResponseEntity<List<MyOrderDTO>> getPendingOrders() {
+        return ResponseEntity.ok(orderService.getPendingOrders());
+    }
+
+    @GetMapping("/detalle/{orderId}")
+   
+    public ResponseEntity<MyOrderDetailDTO> getOrderDetails(@PathVariable UUID orderId) {
+        return ResponseEntity.ok(orderService.getOrderDetails(orderId));
+    }
+    
     @GetMapping("/mis-boletas")
-    @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<PaginatedResponseDTO<MyOrderDTO>> getMyOrders(
             @RequestParam(required = false, defaultValue = "UPCOMING") OrderFilter filter,
             @RequestParam(defaultValue = "0") int page,

@@ -1,6 +1,6 @@
 package com.cesde.eventhub.service;
 
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,13 +17,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cesde.eventhub.dto.MessageDTO;
+import com.cesde.eventhub.dto.MyOrderDetailDTO;
 import com.cesde.eventhub.dto.request.ConfirmPay;
 import com.cesde.eventhub.dto.request.PhysicalSaleRequestDTO;
 import com.cesde.eventhub.dto.request.PurchaseRequestDTO;
 import com.cesde.eventhub.dto.response.CategoryReportDTO;
 import com.cesde.eventhub.dto.response.GeneralReportResponseDTO;
 import com.cesde.eventhub.dto.response.MyOrderDTO;
-import com.cesde.eventhub.dto.response.MyTicketDTO;
 import com.cesde.eventhub.dto.response.OrderHistoryResponseDTO;
 import com.cesde.eventhub.dto.response.OrderResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
@@ -114,8 +115,10 @@ public class OrderService {
                     ticket.setStatus(TicketStatus.RESERVADO);
                     return ticket;
                 }).collect(Collectors.toList());
+        
+        savedOrder.setTickets(tickets);
         ticketRepository.saveAll(tickets);
-
+        orderRepository.flush();
         
         return orderMapper.toResponseDTO(savedOrder, expirationTime);
     }
@@ -125,8 +128,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO confirmPayment(UUID orderId, ConfirmPay request) {
       
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UUID userId = UUID.fromString(username);
+        UUID userId = userService.getAuthenticatedUserId();
 
         Order order = findById(orderId);
 
@@ -162,9 +164,9 @@ public class OrderService {
     }
 
     
-    @PreAuthorize("hasAuthority('CLIENTE') or hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE')")
     @Transactional
-    public OrderResponseDTO cancelOrder(UUID orderId) {
+    public MessageDTO cancelOrder(UUID orderId) {
        
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID userId = UUID.fromString(username);
@@ -178,13 +180,23 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELADA);
+        
+        order.getTickets().forEach(ticket -> {
+            ticket.setStatus(TicketStatus.CANCELADA); 
+            
+            TicketPrice tp = ticket.getTicketPrice();
+            tp.setAvailableQuantity(tp.getAvailableQuantity() + 1);
+            ticketPriceRepository.save(tp);
+        });
 
-        ticketRepository.deleteAll(order.getTickets());
+       // ticketRepository.deleteAll(order.getTickets());
         order.getTickets().clear();
 
-        Order savedOrder = orderRepository.save(order);
+       orderRepository.save(order);
 
-        return orderMapper.toResponseDTO(savedOrder, savedOrder.getExpirationDate());
+       MessageDTO message = new MessageDTO("Boleta cancelada correctamente");
+       return message;
+      
     }
     
     
@@ -252,29 +264,30 @@ public class OrderService {
     @PreAuthorize("hasRole('CLIENTE')")
     @Transactional(readOnly = true)
     public PaginatedResponseDTO<MyOrderDTO> getMyOrders(OrderFilter filter, int page, int size) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UUID userId = UUID.fromString(username);
+        UUID userId = userService.getAuthenticatedUserId();
+        Client client = clientService.findByUserId(userId);
+        UUID clientId = client.getId();
         LocalDate now = LocalDate.now();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Page<Order> orderPage;
-
+        
         if (filter == OrderFilter.UPCOMING) {
             
-            orderPage = orderRepository.findByClient_UserIdAndStatusAndEvent_EventDateGreaterThanEqual(
-                    userId, OrderStatus.PAGADA, now, pageable);
+        	orderPage = orderRepository.findByClientIdAndStatusAndEvent_EventDateGreaterThanEqual(
+                    clientId, OrderStatus.PAGADA, now, pageable);
         } else if (filter == OrderFilter.PAST) {
            
-            orderPage = orderRepository.findByClient_UserIdAndStatusAndEvent_EventDateLessThan(
-                    userId, OrderStatus.PAGADA, now, pageable);
+        	orderPage = orderRepository.findByClientIdAndStatusAndEvent_EventDateLessThan(
+                    clientId, OrderStatus.PAGADA, now, pageable);
         } else {
-            orderPage = orderRepository.findByClient_UserIdAndStatus(
-                    userId, OrderStatus.PAGADA, pageable);
+        	orderPage = orderRepository.findByClientIdAndStatus(
+                    clientId, OrderStatus.PAGADA, pageable);
         }
-        
+        System.out.println("Cantidad de órdenes encontradas en DB: " + orderPage.getSize());
       
-        return PaginationUtils.toPaginatedResponse(orderPage, this::mapToMyOrderDTO);
+        return PaginationUtils.toPaginatedResponse(orderPage, orderMapper::toMyOrderDTO);
     }
     
     @PreAuthorize("hasRole('ORGANIZADOR')")
@@ -299,6 +312,43 @@ public class OrderService {
                 organizerId, eventId, status, startDate, endDate, pageable);
 
         return PaginationUtils.toPaginatedResponse(orderPage, orderMapper::toHistoryDTO);
+    }
+    
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('CLIENTE')")
+    public List<MyOrderDTO> getPendingOrders() {
+        UUID userId = userService.getAuthenticatedUserId();
+        
+        Client cliente = clientService.findByUserId(userId);
+        
+        UUID clienteId = cliente.getId();
+        System.out.println("Buscando órdenes pendientes para el usuario: " +  clienteId);
+        List<Order> pendingOrders = orderRepository.findPendingOrdersByClientId(clienteId, OrderStatus.PENDIENTE);
+        System.out.println("Cantidad de órdenes encontradas en DB: " + pendingOrders.size());
+        
+        if (!pendingOrders.isEmpty()) {
+            System.out.println("ID de la primera orden real en Java: " + pendingOrders.get(0).getId());
+        }
+        
+        List<MyOrderDTO> dtos = pendingOrders.stream()
+                .map(orderMapper::toMyOrderDTO)
+                .toList();
+        
+        System.out.println("Cantidad de DTOs después del mapper: " + dtos.size());
+        return dtos;
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('CLIENTE')")
+    public MyOrderDetailDTO getOrderDetails(UUID orderId) {
+        UUID userId = userService.getAuthenticatedUserId();
+        
+        Client owner = validateOwner(userId, orderId);
+        
+        Order order = orderRepository.findByIdAndClientId(orderId, owner.getId())
+                .orElseThrow(() -> new DataNotFound("La orden no existe o no te pertenece."));
+                
+        return orderMapper.toMyOrderDetailDTO(order);
     }
     
     @PreAuthorize("hasRole('ADMIN')")
@@ -367,33 +417,28 @@ public class OrderService {
     return order;
     }
     
-    private MyOrderDTO mapToMyOrderDTO(Order order) {
-        MyOrderDTO dto = new MyOrderDTO();
-        dto.setOrderId(order.getId());
-        dto.setEventName(order.getEvent().getName()); 
-        dto.setEventDate(order.getEvent().getEventDate()); 
-        dto.setOrderStatus(order.getStatus().name());
-
-       
-        List<MyTicketDTO> ticketDTOs = order.getTickets().stream().map(t -> {
-            MyTicketDTO tdto = new MyTicketDTO();
-            tdto.setTicketId(t.getId()); 
-            tdto.setCode(t.getCode()); 
-            tdto.setStatus(t.getStatus().name());
-            tdto.setZoneName(t.getTicketPrice().getZone().getName()); 
-            return tdto;
-        }).toList();
-
-        dto.setTickets(ticketDTOs);
-        return dto;
-    }
+    public Client validateOwner(UUID userId, Order order) {
     
-    public void validateOwner(UUID userId, Order order) {
-    
-    	if (order.getClient().getUser() == null || !order.getClient().getUser().getId().equals(userId)) {
-            throw new Unauthorized("No tienes permiso para modificar o cancelar esta orden.");
+    	Client authenticatedClient = clientService.findByUserId(userId);
+    	
+    	if (!order.getClient().getId().equals(authenticatedClient.getId())) {
+            throw new Unauthorized("No tienes permiso para acceder, modificar o cancelar esta orden.");
         }
+    	return authenticatedClient;
     }
+    
+    public Client validateOwner(UUID userId, UUID orderId) {
+        
+    	Client authenticatedClient = clientService.findByUserId(userId);
+    	Order order = findById(orderId);
+    	
+    	if (!order.getClient().getId().equals(authenticatedClient.getId())) {
+            throw new Unauthorized("No tienes permiso para acceder, modificar o cancelar esta orden.");
+        }
+    	
+    	return authenticatedClient;
+    }
+    
     
     
     

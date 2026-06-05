@@ -89,9 +89,9 @@ public class UserService {
 
 		public void validateAuthority(UUID ownerId) {
 		   
-		    String currentUserIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+		   
 		    
-		    UUID currentUserId = UUID.fromString(currentUserIdStr);
+		    UUID currentUserId = getAuthenticatedUserId();
 		    
 		   boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
 	                .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -156,6 +156,11 @@ public class UserService {
 		}
 		
 	}
+	
+	public UUID getAuthenticatedUserId() {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        return UUID.fromString(userIdStr);
+    }
 	
 	public User findByEmail(String email) {
 		

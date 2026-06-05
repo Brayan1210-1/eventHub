@@ -3,6 +3,8 @@ package com.cesde.eventhub.dto.response;
 import lombok.Data;
 import java.util.UUID;
 
+import com.cesde.eventhub.enums.TicketStatus;
+
 @Data
 public class MyTicketDTO {
     
@@ -12,5 +14,5 @@ public class MyTicketDTO {
     
     private UUID code; 
     
-    private String status;
+    private TicketStatus status;
 }
