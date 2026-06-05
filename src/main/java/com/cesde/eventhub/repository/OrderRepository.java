@@ -3,6 +3,7 @@ package com.cesde.eventhub.repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -22,18 +23,20 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt < :limitTime")
     List<Order> findExpiredOrders(@Param("status") OrderStatus status, @Param("limitTime") LocalDateTime limitTime);
     
+    @Query("SELECT o FROM Order o WHERE o.client.id = :clientId AND o.status = :status")
+    List<Order> findPendingOrdersByClientId(@Param("clientId") UUID userId, @Param("status") OrderStatus status);
     
+    @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.client.id = :clientId")
+    Optional<Order> findByIdAndClientId(@Param("orderId") UUID orderId, @Param("clientId") UUID clientId);
     
-    Page<Order> findByClient_UserIdAndStatus(
-            UUID userId, OrderStatus status, Pageable pageable);
+    Page<Order> findByClientIdAndStatus(
+            UUID clientId, OrderStatus status, Pageable pageable);
    
-    
-    Page<Order> findByClient_UserIdAndStatusAndEvent_EventDateGreaterThanEqual(
-            UUID userId, OrderStatus status, LocalDate date, Pageable pageable);
-
+    Page<Order> findByClientIdAndStatusAndEvent_EventDateGreaterThanEqual(
+            UUID clientId, OrderStatus status, LocalDate date, Pageable pageable);
    
-    Page<Order> findByClient_UserIdAndStatusAndEvent_EventDateLessThan(
-            UUID userId, OrderStatus status, LocalDate date, Pageable pageable);
+    Page<Order> findByClientIdAndStatusAndEvent_EventDateLessThan(
+            UUID clientId, OrderStatus status, LocalDate date, Pageable pageable);
     
     @Query("SELECT o FROM Order o WHERE o.event.organizer.id = :organizerId " +
             "AND (:eventId IS NULL OR o.event.id = :eventId) " +
