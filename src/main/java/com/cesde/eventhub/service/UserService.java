@@ -113,8 +113,6 @@ public class UserService {
 	        User newUser = new User();
 	        newUser.setEmail(dto.getEmail());
 	        newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
-	        
-	       
 	        newUser.setActive(true); 
 
 	      
@@ -134,7 +132,10 @@ public class UserService {
 	        if (hasClienteRole) {
 	            Client client = new Client();
 	            client.setUser(savedUser);
-	            client.setName("Usuario Registrado por Admin");
+	            client.setName(dto.getName());
+	            client.setPhone(dto.getPhone());
+	            client.setDocument(dto.getDocument());
+	            client.setLastName(dto.getLastName());
 	            clientRepository.save(client);
 	        }
 
