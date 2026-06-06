@@ -234,7 +234,7 @@ public class EventService {
         }
 
         long totalSold = ticketRepository.countByOrder_EventIdAndOrder_Status(eventId, OrderStatus.PAGADA);
-        Double rawRevenue = ticketRepository.sumRevenueByEventId(eventId);
+        Double rawRevenue = ticketRepository.sumRevenueByEventId(eventId, OrderStatus.PAGADA);
         double totalRevenue = rawRevenue != null ? rawRevenue : 0.0;
 
         long totalRemaining = event.getTicketPrices().stream()
