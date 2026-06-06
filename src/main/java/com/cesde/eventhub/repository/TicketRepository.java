@@ -29,8 +29,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     
     long countByOrder_EventIdAndStatus(Long eventId, TicketStatus status);
 
-    @Query("SELECT SUM(t.ticketPrice.price) FROM Ticket t WHERE t.order.event.id = :eventId AND t.order.status = 'PAGADA'")
-    Double sumRevenueByEventId(@Param("eventId") Long eventId);
+    @Query("SELECT SUM(t.ticketPrice.price) FROM Ticket t WHERE t.order.event.id = :eventId AND t.order.status = :status")
+    Double sumRevenueByEventId(@Param("eventId") Long eventId, @Param("status") OrderStatus status);
 
    
     @Query("SELECT t.ticketPrice.zone.name as zoneName, COUNT(t) as ticketsSold, SUM(t.ticketPrice.price) as revenue " +

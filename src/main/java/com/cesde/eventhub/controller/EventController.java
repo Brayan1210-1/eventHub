@@ -91,12 +91,13 @@ public class EventController {
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping("/boletas/validar")
+    @PatchMapping("/{eventId}/boletas/validar")
     @PreAuthorize("hasRole('ORGANIZADOR')")
     public ResponseEntity<TicketValidationResponseDTO> scanAndValidateTicket(
+    		    @PathVariable Long eventId,
             @Valid @RequestBody TicketValidationRequestDTO request) {
         
-        return ResponseEntity.ok(ticketService.validateTicket(request));
+        return ResponseEntity.ok(ticketService.validateTicket(eventId,request));
     }
     
     @GetMapping("/mis-ventas")

@@ -8,8 +8,6 @@ import java.util.UUID;
 @Data
 public class TicketValidationRequestDTO {
     @NotNull(message = "El código de la boleta es obligatorio")
-    private UUID ticketCode;
+    private String ticketCode;
 
-    @NotNull(message = "El ID del evento actual es obligatorio")
-    private Long eventId;
 }

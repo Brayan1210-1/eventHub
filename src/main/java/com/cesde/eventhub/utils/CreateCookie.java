@@ -8,7 +8,7 @@ public class CreateCookie {
 	public static void setRefreshTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("refresh_token", token);
         cookie.setHttpOnly(true);   
-        cookie.setSecure(false);  
+        cookie.setSecure(true);  
         cookie.setPath("/");        
         cookie.setMaxAge(7 * 24 * 60 * 60); 
         

@@ -29,13 +29,23 @@ public class TicketService {
 
 	@PreAuthorize("hasRole('ORGANIZADOR')")
     @Transactional
-    public TicketValidationResponseDTO validateTicket(TicketValidationRequestDTO request) {
+    public TicketValidationResponseDTO validateTicket(Long eventId,TicketValidationRequestDTO request) {
 		
 	
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID authenticatedOrganizerId = UUID.fromString(username);
             
-        Optional<Ticket> optionalTicket = ticketRepository.findByCode(request.getTicketCode());
+        UUID validTicketCode;
+        try {
+            validTicketCode = UUID.fromString(request.getTicketCode());
+        } catch (IllegalArgumentException e) {
+            return TicketValidationResponseDTO.builder()
+                    .isValid(false)
+                    .message("❌ QR INVÁLIDO: El código escaneado no tiene un formato válido.")
+                    .build();
+        }
+        
+        Optional<Ticket> optionalTicket = ticketRepository.findByCode(validTicketCode);
         if (optionalTicket.isEmpty()) {
             return TicketValidationResponseDTO.builder()
                     .isValid(false)
@@ -54,7 +64,7 @@ public class TicketService {
                     .build();
         }
        
-        if (!event.getId().equals(request.getEventId())) {
+        if (!event.getId().equals(eventId)) {
             return buildInvalidResponse("❌ EVENTO INCORRECTO: Esta boleta pertenece a: " + event.getName(), ticket, client);
         }
 
