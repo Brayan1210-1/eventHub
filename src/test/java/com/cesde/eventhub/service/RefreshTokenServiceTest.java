@@ -1,10 +1,9 @@
 package com.cesde.eventhub.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals; 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,8 +21,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import com.cesde.eventhub.dto.response.ResponseLoginDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.entity.RefreshToken;
 import com.cesde.eventhub.entity.User;

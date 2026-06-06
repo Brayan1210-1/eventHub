@@ -1,27 +1,34 @@
 package com.cesde.eventhub.utils;
 
-import jakarta.servlet.http.Cookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie; 
+
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CreateCookie {
 
 	public static void setRefreshTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("refresh_token", token);
-        cookie.setHttpOnly(true);   
-        cookie.setSecure(true);  
-        cookie.setPath("/");        
-        cookie.setMaxAge(7 * 24 * 60 * 60); 
-        
-        response.addCookie(cookie);
-    }
-	
+	   
+	    ResponseCookie cookie = ResponseCookie.from("refresh_token", token)
+	            .httpOnly(true)
+	            .secure(true)       
+	            .sameSite("None")   
+	            .path("/")
+	            .maxAge(7 * 24 * 60 * 60)
+	            .build();
+	    
+	    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+	}
+
 	public static void deleteRefreshTokenCookie(HttpServletResponse response) {
-		Cookie cookie = new Cookie("refresh_token", null);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge(0);
-		
-		response.addCookie(cookie);
+	    ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+	            .httpOnly(true)
+	            .secure(true)
+	            .sameSite("None")   
+	            .path("/")
+	            .maxAge(0)          
+	            .build();
+	    
+	    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 	}
 }
