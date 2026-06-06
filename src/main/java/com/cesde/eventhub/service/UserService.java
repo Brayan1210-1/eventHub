@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cesde.eventhub.dto.LoginDTO;
+import com.cesde.eventhub.dto.MessageDTO;
 import com.cesde.eventhub.dto.request.AdminUserRegisterDTO;
 import com.cesde.eventhub.dto.request.UserRegisterDTO;
 import com.cesde.eventhub.dto.response.UserResponseDTO;
@@ -104,7 +105,7 @@ public class UserService {
 		
 		@Transactional
 		@PreAuthorize(value = "hasRole('ADMIN')")
-	    public UserResponseDTO createUserByAdmin(AdminUserRegisterDTO dto) {
+	    public MessageDTO createUserByAdmin(AdminUserRegisterDTO dto) {
 	        
 	        if (userRepository.existsByEmail(dto.getEmail())) {
 	            throw new InvalidRegistration("El correo electrónico ya se encuentra registrado.");
@@ -127,9 +128,10 @@ public class UserService {
 	        User savedUser = userRepository.save(newUser);
 
 	     
-	        boolean hasClienteRole = dto.getRoles().contains(UserRoles.CLIENTE);
+	        boolean hasClientRole = dto.getRoles().contains(UserRoles.CLIENTE);
+	       
 
-	        if (hasClienteRole) {
+	        if (hasClientRole) {
 	            Client client = new Client();
 	            client.setUser(savedUser);
 	            client.setName(dto.getName());
@@ -138,8 +140,9 @@ public class UserService {
 	            client.setLastName(dto.getLastName());
 	            clientRepository.save(client);
 	        }
-
-	        return userMapper.toResponseDTO(savedUser);
+	        
+	        MessageDTO message = new MessageDTO("Usuario creado exitosamente");
+	        return  message;
 	    }
 	
 	public void validateData(UserRegisterDTO userDTO) {

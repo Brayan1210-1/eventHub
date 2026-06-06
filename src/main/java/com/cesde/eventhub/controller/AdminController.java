@@ -1,7 +1,7 @@
 package com.cesde.eventhub.controller;
 
 
-import org.springframework.http.HttpStatus; 
+import org.springframework.http.HttpStatus;  
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,6 @@ import com.cesde.eventhub.dto.request.UpdatePlaceDTO;
 import com.cesde.eventhub.dto.response.GeneralReportResponseDTO;
 import com.cesde.eventhub.dto.response.PaginatedResponseDTO;
 import com.cesde.eventhub.dto.response.PlaceResponseDTO;
-import com.cesde.eventhub.dto.response.UserResponseDTO;
 import com.cesde.eventhub.service.OrderService;
 import com.cesde.eventhub.service.PlaceService;
 import com.cesde.eventhub.service.UserService;
@@ -73,8 +72,8 @@ public class AdminController {
 	
 	
     @PostMapping("/crear/usuarios")
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody AdminUserRegisterDTO request) {
-        UserResponseDTO response = userService.createUserByAdmin(request);
+    public ResponseEntity<MessageDTO> createUser(@Valid @RequestBody AdminUserRegisterDTO request) {
+         MessageDTO response = userService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
